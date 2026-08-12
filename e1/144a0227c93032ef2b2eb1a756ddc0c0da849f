@@ -1,0 +1,24 @@
+wrangler.jsonc
+  s_5fef2ed1422915::t_63f35c96aa0fe3 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "e1144a0227c93032ef2b2eb1a756ddc0c0da849f",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_5fef2ed1422915": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ff69d-29c2-7b32-84fb-c5babebb9861",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
