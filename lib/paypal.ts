@@ -180,5 +180,7 @@ async function createPayPalHeaders() {
 
 // getPayPalBaseUrl 根据环境变量选择 PayPal sandbox 或 live API。
 function getPayPalBaseUrl() {
-  return process.env.PAYPAL_ENV === 'live' ? paypalApiBaseUrls.live : paypalApiBaseUrls.sandbox;
+  const paypalEnvironment = process.env.PAYPAL_ENV ?? process.env.PAYPAL_ENVIRONMENT;
+
+  return paypalEnvironment === 'live' ? paypalApiBaseUrls.live : paypalApiBaseUrls.sandbox;
 }

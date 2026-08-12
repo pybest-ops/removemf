@@ -2,7 +2,10 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 
 // shouldTrustHost 控制 Auth.js 是否信任当前请求 Host，开发和 Cloudflare 反代环境需要开启。
-const shouldTrustHost = process.env.NODE_ENV === 'development' || process.env.AUTH_TRUST_HOST === 'true';
+const shouldTrustHost = process.env.NODE_ENV === 'development' || process.env.AUTH_TRUST_HOST !== 'false';
+
+// authSecret 是 Auth.js 签发会话令牌使用的服务端密钥，兼容远端已有的历史键名。
+const authSecret = process.env.AUTH_SECRET ?? process.env.AUTH_SESSION_SECRET;
 
 // authConfig 定义站点的第三方登录提供方和登录态签发规则。
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -21,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       userinfo: 'https://openidconnect.googleapis.com/v1/userinfo'
     })
   ],
-  secret: process.env.AUTH_SECRET,
+  secret: authSecret,
   session: {
     strategy: 'jwt'
   },

@@ -6,6 +6,10 @@
   "preview_urls": true,
   "compatibility_date": "2026-08-12",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "NEXT_PUBLIC_APP_URL": "https://removematchafilter.org",
+    "AUTH_TRUST_HOST": "true"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
