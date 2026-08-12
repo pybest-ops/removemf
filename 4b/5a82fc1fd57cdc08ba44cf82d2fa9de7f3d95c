@@ -1,0 +1,55 @@
+app/api/jobs/route.ts
+  s_08e1839d7cbb0e::t_2daccf7ea0fc6c 17-18,37
+  s_08e1839d7cbb0e::t_0bf3bfb3fa5573 21
+lib/replicate.ts
+  s_08e1839d7cbb0e::t_2daccf7ea0fc6c 24,65
+  s_08e1839d7cbb0e::t_0bf3bfb3fa5573 20,35-46
+components/ImageUploadFlow.tsx
+  s_08e1839d7cbb0e::t_04b128730cf1c4 81-91
+package.json
+  s_08e1839d7cbb0e::t_b7f98ec99c09b9 12-13
+app/api/uploads/sign/route.ts
+  s_08e1839d7cbb0e::t_2414445504b36c 2-37
+app/api/uploads/direct/route.ts
+  s_08e1839d7cbb0e::t_18d01eedfdae19 1-44
+lib/r2.ts
+  s_08e1839d7cbb0e::t_b7f98ec99c09b9 1-103
+.gitignore
+  s_08e1839d7cbb0e::t_1c9fbbb36f0afd 13-15
+  h_4b5baf569fa24a 1-12
+r2-dev-setup.md
+  s_08e1839d7cbb0e::t_bc17210bb1a4ed 1-19
+lib/uploadsStore.ts
+  s_08e1839d7cbb0e::t_18d01eedfdae19 1-25
+replicate-dev-setup.md
+  s_08e1839d7cbb0e::t_af14d85c8d5c7e 5-6
+  s_08e1839d7cbb0e::t_7879c6a0d51ed8 8-24
+lib/storage.ts
+  s_08e1839d7cbb0e::t_2414445504b36c 1,4-9,21-45
+  s_08e1839d7cbb0e::t_04b128730cf1c4 2-3,10-13
+README.md
+  s_08e1839d7cbb0e::t_af14d85c8d5c7e 25-26
+  s_08e1839d7cbb0e::t_7879c6a0d51ed8 27,29
+  s_08e1839d7cbb0e::t_bc17210bb1a4ed 28,30-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "4b5a82fc1fd57cdc08ba44cf82d2fa9de7f3d95c",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_08e1839d7cbb0e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ff581-0f5e-7690-9279-91066f66890e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
