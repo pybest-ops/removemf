@@ -1,9 +1,23 @@
+import { getAuthenticatedUser } from '@/lib/authUser';
+import { getUserBillingSnapshotAsync, upsertUser } from '@/lib/billingStore';
 import { NextResponse } from 'next/server';
 
 export async function POST() {
+  const user = await getAuthenticatedUser();
+
+  if (!user) {
+    return NextResponse.json({
+      user: null,
+      creditsBalance: 0,
+      anonymous: true
+    });
+  }
+
+  await upsertUser(user);
+
   return NextResponse.json({
-    sessionId: 'sess_demo',
-    creditsBalance: 3,
-    anonymous: true
+    user,
+    creditsBalance: (await getUserBillingSnapshotAsync(user.id)).creditsBalance,
+    anonymous: false
   });
 }

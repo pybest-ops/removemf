@@ -1,11 +1,17 @@
 # 首页结构草案
 
+## 0. Header
+
+- 品牌：Remove Matcha Filter
+- 导航：Upload / Credits / FAQ
+- 主 CTA：Upload a photo
+
 ## 1. Hero
 
 - 标题：Remove Matcha Filter from Your Photo
 - 副标题：Upload a photo and let AI restore a more natural look in seconds.
 - 主 CTA：Upload a photo
-- 次 CTA：Try free credits
+- 次 CTA：View credit packs
 
 ## 2. Upload area
 

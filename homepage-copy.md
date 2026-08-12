@@ -1,27 +1,33 @@
-# 首页文案草案
+# 首页文案冻结版
 
 ## Hero
 
-Remove Matcha Filter
-A focused subscription site for removing and understanding matcha-style filter effects.
+Remove Matcha Filter from Your Photo
+Upload a photo and let AI reduce greenish, yellowish, or matcha-style color casts while keeping the result natural.
 
 ## Subcopy
 
-Learn what the matcha filter is, how to remove it, and how to avoid it in the future.
+Built for quick single-photo recovery: upload, preview before and after, then download a more balanced image.
 
 ## CTA
 
-- Join the waitlist
-- Subscribe for updates
+- Upload a photo
+- View credits
 
 ## Benefits
 
-- Clear explanations
-- Practical removal guides
-- Ongoing updates
+- Fast upload flow for JPG, PNG, and WEBP images
+- Natural color correction without promising perfect original recovery
+- Before / after preview before downloading the result
+
+## How it works
+
+- Upload one photo with a visible matcha-style cast
+- AI reduces the green/yellow tint and restores a more natural balance
+- Preview the output and download the result
 
 ## FAQ teaser
 
 - What is matcha filter?
-- Can I remove it?
-- What do subscribers get?
+- Can AI restore the original photo?
+- How do paid credits work?

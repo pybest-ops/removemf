@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { normalizeReplicateStatus, updateStoredJob } from '@/lib/jobsStore';
+import { refundJobCreditsAsync } from '@/lib/billingStore';
+import { getStoredJobAsync, normalizeReplicateStatus, updateStoredJobAsync } from '@/lib/jobsStore';
 import { getReplicateOutputUrl } from '@/lib/replicate';
 import { persistRemoteImageToR2 } from '@/lib/storage';
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
   if (status === 'completed' && outputUrl) {
     const persistedImage = await persistRemoteImageToR2(outputUrl, jobId);
 
-    updateStoredJob(jobId, {
+    await updateStoredJobAsync(jobId, {
       status,
       progress: 100,
       outputObjectKey: persistedImage.objectKey,
@@ -30,9 +31,16 @@ export async function POST(request: Request) {
   }
 
   if (status === 'failed') {
-    updateStoredJob(jobId, {
+    const job = await getStoredJobAsync(jobId);
+
+    if (job?.userId && !job.creditsRefunded) {
+      await refundJobCreditsAsync({ userId: job.userId, jobId: job.jobId, credits: job.costCredits });
+    }
+
+    await updateStoredJobAsync(jobId, {
       status,
       progress: 100,
+      creditsRefunded: true,
       errorCode: 'MODEL_ERROR',
       errorMessage: String(prediction.error ?? 'Replicate prediction failed.')
     });
@@ -40,7 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  updateStoredJob(jobId, { status, progress: status === 'processing' ? 50 : 10 });
+  await updateStoredJobAsync(jobId, { status, progress: status === 'processing' ? 50 : 10 });
 
   return NextResponse.json({ ok: true });
 }

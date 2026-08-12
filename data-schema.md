@@ -6,6 +6,8 @@
 
 ## 2. 表结构
 
+生产 D1 migration 已落到 `migrations/0001_paid_credits.sql`。当前 Next API 仍使用本地内存 store 作为开发 fallback；部署前需要把 `lib/billingStore.ts` 和 `lib/jobsStore.ts` 的读写切到 `DB` binding。
+
 ### `sessions`
 
 匿名会话表。

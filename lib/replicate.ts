@@ -1,5 +1,5 @@
 type ReplicatePredictionInput = {
-  image: string;
+  input_image: string;
 };
 
 type ReplicatePredictionRequest = {
@@ -28,7 +28,7 @@ export async function createReplicatePrediction(inputImageUrl: string, webhookUr
 
   const payload: ReplicatePredictionRequest = {
     input: {
-      image: inputImageUrl
+      input_image: inputImageUrl
     }
   };
 

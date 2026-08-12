@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { useMemo, useState } from 'react';
 import type { UploadSignResponse } from '@/lib/types';
 import { useJobPolling } from '@/lib/useJobPolling';
@@ -12,6 +14,7 @@ const supportedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 // ImageUploadFlow 提供图片选择、上传任务创建和任务状态轮询的主流程。
 export function ImageUploadFlow() {
+  const { data: session, status } = useSession();
   const [file, setFile] = useState<File | null>(null);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
@@ -56,6 +59,11 @@ export function ImageUploadFlow() {
   async function handleSubmit() {
     if (!file) return;
 
+    if (status !== 'loading' && !session?.user) {
+      showLoginWipMessage();
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
 
@@ -97,13 +105,24 @@ export function ImageUploadFlow() {
         body: JSON.stringify({ inputObjectKey: signResult.objectKey, modelName: 'fofr/color-matcher' })
       });
 
-      if (!jobResponse.ok) throw new Error('job_failed');
+      if (!jobResponse.ok) {
+        const errorResult = await jobResponse.json();
+        if (errorResult.errorCode === 'INSUFFICIENT_CREDITS') {
+          throw new Error('INSUFFICIENT_CREDITS');
+        }
+
+        if (errorResult.errorCode === 'UNAUTHORIZED') {
+          throw new Error('Please sign in with Google before restoring an image.');
+        }
+
+        throw new Error(errorResult.errorMessage ?? 'job_failed');
+      }
 
       const jobResult = await jobResponse.json();
 
       setJobId(jobResult.jobId);
-    } catch {
-      setErrorMessage('Upload failed. Please try again.');
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Upload failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -122,6 +141,11 @@ export function ImageUploadFlow() {
         </label>
 
         {errorMessage ? <p className="mt-4 text-sm text-red-600">{errorMessage}</p> : null}
+        {errorMessage === 'INSUFFICIENT_CREDITS' ? (
+          <Link className="mt-4 inline-flex rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white" href="/pricing">
+            Buy credits
+          </Link>
+        ) : null}
 
         <button
           className="mt-5 rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
@@ -129,14 +153,14 @@ export function ImageUploadFlow() {
           onClick={handleSubmit}
           type="button"
         >
-          {isSubmitting ? 'Creating job...' : 'Restore image'}
+          {isSubmitting ? 'Creating job...' : session?.user ? 'Restore image · 1 credit' : 'Sign in to restore'}
         </button>
       </section>
 
       <aside className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
         <h2 className="text-lg font-semibold text-slate-900">Result status</h2>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          {job ? `Status: ${job.status} (${job.progress}%)` : 'Upload an image to create a restoration job.'}
+          {job ? `Status: ${job.status} (${job.progress}%)` : 'Upload an image, sign in, and use 1 credit to create a restoration job.'}
         </p>
         {isPolling ? <p className="mt-2 text-sm text-matcha-700">Checking result...</p> : null}
         {job?.status === 'completed' && job.outputPreviewUrl ? (
@@ -150,4 +174,9 @@ export function ImageUploadFlow() {
       </aside>
     </div>
   );
+}
+
+// showLoginWipMessage 提示用户当前登录功能仍在开发中。
+function showLoginWipMessage() {
+  window.alert('Feature under development. Stay tuned.');
 }

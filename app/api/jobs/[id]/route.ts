@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getStoredJob, normalizeReplicateStatus, updateStoredJob } from '@/lib/jobsStore';
+import { refundJobCreditsAsync } from '@/lib/billingStore';
+import { getStoredJobAsync, normalizeReplicateStatus, updateStoredJobAsync } from '@/lib/jobsStore';
 import { getReplicateOutputUrl, getReplicatePrediction } from '@/lib/replicate';
 import { persistRemoteImageToR2 } from '@/lib/storage';
 
 // GET 查询图片恢复任务状态；有 Replicate prediction 时同步刷新状态。
 export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const job = getStoredJob(params.id);
+  const job = await getStoredJobAsync(params.id);
 
   if (!job) {
     return NextResponse.json({ errorCode: 'JOB_NOT_FOUND' }, { status: 404 });
@@ -20,7 +21,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     if (status === 'completed' && outputUrl) {
       const persistedImage = await persistRemoteImageToR2(outputUrl, job.jobId);
 
-      const completedJob = updateStoredJob(job.jobId, {
+      const completedJob = await updateStoredJobAsync(job.jobId, {
         status,
         progress: 100,
         outputObjectKey: persistedImage.objectKey,
@@ -31,9 +32,14 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     }
 
     if (status === 'failed') {
-      const failedJob = updateStoredJob(job.jobId, {
+      if (job.userId && !job.creditsRefunded) {
+        await refundJobCreditsAsync({ userId: job.userId, jobId: job.jobId, credits: job.costCredits });
+      }
+
+      const failedJob = await updateStoredJobAsync(job.jobId, {
         status,
         progress,
+        creditsRefunded: true,
         errorCode: 'MODEL_ERROR',
         errorMessage: prediction.error ?? 'Replicate prediction failed.'
       });
@@ -41,7 +47,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       return NextResponse.json(failedJob);
     }
 
-    const updatedJob = updateStoredJob(job.jobId, { status, progress });
+    const updatedJob = await updateStoredJobAsync(job.jobId, { status, progress });
 
     return NextResponse.json(updatedJob);
   }

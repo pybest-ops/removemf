@@ -18,7 +18,6 @@
 - 本地未接 R2 时，前端会把图片直传到后端内存，再转成 data URI 给 Replicate
 - R2 和 D1 仍是适配层占位，未接真实 Cloudflare 资源
 
-## 本地限制
+## webhook 规则
 
-- 临时直传只允许 1MB 内图片，避免 data URI 过大
-- Replicate webhook 需要公网可访问地址；本地没有 tunnel 时，轮询接口仍可刷新任务状态
+Replicate webhook 必须是 HTTPS URL。当前代码只会在 `APP_PUBLIC_BASE_URL` 或 `NEXT_PUBLIC_APP_URL` 以 `https://` 开头时传 webhook；本地 `http://localhost` 会自动不传，改用前端轮询刷新状态。

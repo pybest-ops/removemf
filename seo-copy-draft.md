@@ -1,4 +1,4 @@
-# 首页文案草案
+# SEO 文案冻结版
 
 ## Hero
 
@@ -12,7 +12,7 @@ Fix greenish, yellowish, or matcha-style color shifts with an AI image recovery 
 ## CTA
 
 - Upload a photo
-- Try free credits
+- View credits
 
 ## FAQ
 
