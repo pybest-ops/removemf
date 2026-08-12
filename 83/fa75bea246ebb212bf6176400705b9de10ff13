@@ -1,0 +1,28 @@
+wrangler.jsonc
+  s_5fef2ed1422915::t_89072aaaadedea 9-12
+auth.ts
+  s_5fef2ed1422915::t_89072aaaadedea 5-8,27
+lib/paypal.ts
+  s_5fef2ed1422915::t_89072aaaadedea 183-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "83fa75bea246ebb212bf6176400705b9de10ff13",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_5fef2ed1422915": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ff69d-29c2-7b32-84fb-c5babebb9861",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
