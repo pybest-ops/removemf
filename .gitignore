@@ -1,0 +1,15 @@
+.env.local
+.env.example
+.dev.vars
+.wrangler
+node_modules
+.next
+.open-next
+dist
+*.tsbuildinfo
+
+# Codex local config (contains secrets)
+.codex/config.toml
+
+.env*.local
+.env
