@@ -14,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "matcha-filter-remover",
-      "database_id": "${D1_DATABASE_ID}",
+      "database_id": "444c33d7-0154-4a73-8118-54c4bc02691d",
       "migrations_dir": "migrations"
     }
   ],
