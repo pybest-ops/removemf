@@ -1,12 +1,12 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useCurrentUser } from '@/lib/useCurrentUser';
 import { useState } from 'react';
 import type { CreditPack } from '@/lib/pricing';
 
 // BuyCreditsButton 负责登录校验、创建 PayPal 订单并跳转 approval 页面。
 export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
-  const { data: session, status } = useSession();
+  const { status, user } = useCurrentUser();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -16,8 +16,8 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
 
     if (status === 'loading') return;
 
-    if (!session?.user) {
-      showLoginWipMessage();
+    if (!user) {
+      startGoogleLogin('/pricing');
       return;
     }
 
@@ -36,7 +36,8 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
 
       window.location.href = result.approvalUrl;
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to start checkout.');
+      const message = error instanceof Error ? error.message : 'Unable to start checkout.';
+      setErrorMessage(message.includes('PayPal') ? `${message} This environment should fall back to mock checkout.` : message);
       setIsLoading(false);
     }
   }
@@ -49,14 +50,14 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
         onClick={handleBuy}
         type="button"
       >
-        {isLoading ? 'Opening PayPal...' : session?.user ? 'Buy credits' : 'Sign in to buy'}
+        {isLoading ? 'Opening PayPal...' : user ? 'Buy credits' : 'Sign in to buy'}
       </button>
       {errorMessage ? <p className="mt-3 text-sm text-red-600">{errorMessage}</p> : null}
     </div>
   );
 }
 
-// showLoginWipMessage 提示用户当前登录功能仍在开发中。
-function showLoginWipMessage() {
-  window.alert('Feature under development. Stay tuned.');
+// startGoogleLogin 跳转到服务端 Google OAuth 发起接口。
+function startGoogleLogin(returnTo: string) {
+  window.location.assign(`/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`);
 }

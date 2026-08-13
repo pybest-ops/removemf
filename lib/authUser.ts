@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { getCurrentUser } from '@/lib/googleAuth';
 
 // AuthenticatedUser 是付费和任务接口使用的最小用户身份。
 export type AuthenticatedUser = {
@@ -8,17 +8,17 @@ export type AuthenticatedUser = {
   image?: string | null;
 };
 
-// getAuthenticatedUser 从 Auth.js session 中读取 Google 邮箱身份。
-export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
-  const session = await auth();
-  const email = session?.user?.email;
+// getAuthenticatedUser 从本站签名 session cookie 中读取 Google 邮箱身份。
+export async function getAuthenticatedUser(request: Request): Promise<AuthenticatedUser | null> {
+  const user = await getCurrentUser(request);
+  const email = user?.email;
 
   if (!email) return null;
 
   return {
-    id: `google:${email.toLowerCase()}`,
+    id: user.id,
     email,
-    name: session.user?.name,
-    image: session.user?.image
+    name: user.name,
+    image: user.image
   };
 }

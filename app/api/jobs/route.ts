@@ -3,13 +3,14 @@ import { consumeCreditsAsync, upsertUser } from '@/lib/billingStore';
 import { createStoredJobAsync, updateStoredJobAsync } from '@/lib/jobsStore';
 import { jobCostCredits } from '@/lib/pricing';
 import { createReplicatePrediction } from '@/lib/replicate';
+import { buildRestoreSettings, getRestoreSettingsSummary, isReferenceObjectKeyAllowed, serializeRestoreSettings } from '@/lib/restoreSettings';
 import { getPublicInputUrl } from '@/lib/storage';
 import { NextResponse } from 'next/server';
 
 // POST 创建图片恢复任务；必须登录且有足够 credits，每次生成扣 1 credit。
 export async function POST(request: Request) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
 
     if (!user) {
       return NextResponse.json({ errorCode: 'UNAUTHORIZED', errorMessage: 'Please sign in with Google before restoring an image.' }, { status: 401 });
@@ -19,12 +20,19 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const inputObjectKey = String(body.inputObjectKey ?? '');
+    const restoreSettings = buildRestoreSettings(body);
 
     if (!inputObjectKey.startsWith('uploads/original/')) {
       return NextResponse.json({ errorCode: 'INVALID_INPUT_OBJECT' }, { status: 400 });
     }
 
-    const job = await createStoredJobAsync(inputObjectKey, user.id, jobCostCredits, String(body.modelName ?? 'fofr/color-matcher'));
+    if (restoreSettings.referenceObjectKey && !isReferenceObjectKeyAllowed(restoreSettings.referenceObjectKey)) {
+      return NextResponse.json({ errorCode: 'INVALID_REFERENCE_OBJECT' }, { status: 400 });
+    }
+
+    const modelName = String(body.modelName ?? 'fofr/color-matcher');
+    const restoreSettingsJson = serializeRestoreSettings(restoreSettings);
+    const job = await createStoredJobAsync(inputObjectKey, user.id, jobCostCredits, modelName, restoreSettingsJson);
     const consumedCredit = await consumeCreditsAsync({ userId: user.id, jobId: job.jobId, credits: jobCostCredits });
 
     if (!consumedCredit) {
@@ -43,6 +51,11 @@ export async function POST(request: Request) {
 
     const replicateApiToken = process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_TOKEN_PRIVATE;
     const inputImageUrl = await getPublicInputUrl(inputObjectKey);
+    const referenceImageUrl = restoreSettings.referenceObjectKey ? await getPublicInputUrl(restoreSettings.referenceObjectKey) : undefined;
+    const restoreModelInput = {
+      ...restoreSettings.modelInput,
+      ...(referenceImageUrl ? { reference_image: referenceImageUrl } : {})
+    };
 
     if (!replicateApiToken) {
       await updateStoredJobAsync(job.jobId, {
@@ -51,6 +64,8 @@ export async function POST(request: Request) {
         inputPreviewUrl: inputImageUrl,
         outputPreviewUrl: `https://picsum.photos/seed/${encodeURIComponent(job.jobId)}/1200/900`
       });
+
+      const restoreSummary = getRestoreSettingsSummary(restoreSettings);
 
       return NextResponse.json({
         jobId: job.jobId,
@@ -64,7 +79,7 @@ export async function POST(request: Request) {
     const webhookUrl = webhookBaseUrl?.startsWith('https://')
       ? `${webhookBaseUrl}/api/replicate/webhook?jobId=${job.jobId}`
       : undefined;
-    const prediction = await createReplicatePrediction(inputImageUrl, webhookUrl);
+    const prediction = await createReplicatePrediction(inputImageUrl, restoreModelInput, webhookUrl);
 
     await updateStoredJobAsync(job.jobId, {
       replicatePredictionId: prediction.id,
@@ -73,10 +88,13 @@ export async function POST(request: Request) {
       inputPreviewUrl: inputImageUrl
     });
 
+    const restoreSummary = getRestoreSettingsSummary(restoreSettings);
+
     return NextResponse.json({
       jobId: job.jobId,
       status: 'queued',
-      costCredits: jobCostCredits
+      costCredits: jobCostCredits,
+      restoreSummary
     });
   } catch (error) {
     return NextResponse.json(

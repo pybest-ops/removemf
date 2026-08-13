@@ -1,4 +1,4 @@
-import { HeroUploadFlow } from '@/components/HeroUploadFlow';
+import { BeforeAfterSlider } from '@/components/BeforeAfterSlider';
 import Link from 'next/link';
 
 // steps 说明首页上传到下载的核心用户路径。
@@ -49,9 +49,9 @@ function HeroSection() {
           Upload a photo and let AI reduce greenish, yellowish, or matcha-style color casts while keeping the result natural.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <a className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="#upload">
+          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/upload">
             Upload a photo
-          </a>
+          </Link>
           <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href="/pricing">
             View credits
           </Link>
@@ -59,7 +59,9 @@ function HeroSection() {
         <p className="mt-5 text-sm text-slate-500">JPG, PNG, WEBP · Single-photo recovery · Natural output, not original reconstruction</p>
       </div>
 
-      <HeroUploadFlow />
+      <div className="overflow-hidden rounded-[1.75rem] shadow-sm ring-1 ring-black/5">
+        <BeforeAfterSlider />
+      </div>
     </section>
   );
 }

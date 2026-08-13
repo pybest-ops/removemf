@@ -1,9 +1,9 @@
 import './globals.css';
 import { AuthButton } from '@/components/AuthButton';
-import { AuthProvider } from '@/components/AuthProvider';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import favicon from './assets/favicon.ico';
 import logo from './assets/logo.png';
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 // navItems 定义全站顶部导航的核心入口。
 const navItems = [
-  { href: '/#upload', label: 'Upload' },
+  { href: '/upload', label: 'Upload' },
   { href: '/pricing', label: 'Credits' },
   { href: '/faq', label: 'FAQ' }
 ];
@@ -26,10 +26,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <SiteHeader />
-          {children}
-        </AuthProvider>
+        <Script async src="https://plausible.shipsolo.io/js/pa-c21ox6m4U_fyLAfTELQbE.js" />
+        <Script id="plausible-init" strategy="afterInteractive">{`window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};\n  plausible.init()`}</Script>
+        <Script id="clarity" strategy="afterInteractive" type="text/javascript">{`(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "y1rc6msx2v");`}</Script>
+        <SiteHeader />
+        {children}
       </body>
     </html>
   );
@@ -58,9 +63,6 @@ function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <AuthButton />
-          <Link className="rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/#upload">
-            Upload a photo
-          </Link>
         </div>
       </div>
     </header>

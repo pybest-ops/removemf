@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 
 // POST 捕获 PayPal 订单并幂等发放 credits。
 export async function POST(request: Request) {
-  const user = await getAuthenticatedUser();
+  const user = await getAuthenticatedUser(request);
 
   if (!user) {
     return NextResponse.json({ errorCode: 'UNAUTHORIZED', errorMessage: 'Please sign in with Google before capturing payment.' }, { status: 401 });

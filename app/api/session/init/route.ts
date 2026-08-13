@@ -2,8 +2,8 @@ import { getAuthenticatedUser } from '@/lib/authUser';
 import { getUserBillingSnapshotAsync, upsertUser } from '@/lib/billingStore';
 import { NextResponse } from 'next/server';
 
-export async function POST() {
-  const user = await getAuthenticatedUser();
+export async function POST(request: Request) {
+  const user = await getAuthenticatedUser(request);
 
   if (!user) {
     return NextResponse.json({

@@ -3,6 +3,7 @@ import { refundJobCreditsAsync } from '@/lib/billingStore';
 import { getStoredJobAsync, normalizeReplicateStatus, updateStoredJobAsync } from '@/lib/jobsStore';
 import { getReplicateOutputUrl, getReplicatePrediction } from '@/lib/replicate';
 import { persistRemoteImageToR2 } from '@/lib/storage';
+import { getRestoreSettingsSummary } from '@/lib/restoreSettings';
 
 // GET 查询图片恢复任务状态；有 Replicate prediction 时同步刷新状态。
 export async function GET(_: Request, { params }: { params: { id: string } }) {
@@ -11,6 +12,12 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   if (!job) {
     return NextResponse.json({ errorCode: 'JOB_NOT_FOUND' }, { status: 404 });
   }
+
+  const restoreSummary = getRestoreSettingsSummary({
+    restoreMode: job.restoreMode ?? 'natural',
+    skinTonePriority: job.skinTonePriority ?? false,
+    whiteBalanceMode: job.whiteBalanceMode ?? 'standard'
+  });
 
   if (job.replicatePredictionId && job.status !== 'completed' && job.status !== 'failed') {
     const prediction = await getReplicatePrediction(job.replicatePredictionId);
@@ -28,7 +35,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         outputPreviewUrl: persistedImage.publicUrl
       });
 
-      return NextResponse.json(completedJob);
+      return NextResponse.json({ ...completedJob, restoreSummary });
     }
 
     if (status === 'failed') {
@@ -44,13 +51,13 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         errorMessage: prediction.error ?? 'Replicate prediction failed.'
       });
 
-      return NextResponse.json(failedJob);
+      return NextResponse.json({ ...failedJob, restoreSummary });
     }
 
     const updatedJob = await updateStoredJobAsync(job.jobId, { status, progress });
 
-    return NextResponse.json(updatedJob);
+    return NextResponse.json({ ...updatedJob, restoreSummary });
   }
 
-  return NextResponse.json(job);
+  return NextResponse.json({ ...job, restoreSummary });
 }

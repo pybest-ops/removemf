@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useCurrentUser } from '@/lib/useCurrentUser';
 import { useMemo, useState } from 'react';
-import type { UploadSignResponse } from '@/lib/types';
+import type { RestoreMode, WhiteBalanceMode, UploadSignResponse } from '@/lib/types';
 import { useJobPolling } from '@/lib/useJobPolling';
 
 // maxSizeBytes 限制用户首版上传图片体积，避免未接存储前就放大处理成本。
@@ -14,12 +14,15 @@ const supportedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 // ImageUploadFlow 提供图片选择、上传任务创建和任务状态轮询的主流程。
 export function ImageUploadFlow() {
-  const { data: session, status } = useSession();
+  const { status, user } = useCurrentUser();
   const [file, setFile] = useState<File | null>(null);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [restoreMode, setRestoreMode] = useState<RestoreMode>('natural');
+  const [skinTonePriority, setSkinTonePriority] = useState(false);
+  const [whiteBalanceMode, setWhiteBalanceMode] = useState<WhiteBalanceMode>('standard');
   const { job, isPolling } = useJobPolling(jobId);
 
   const canSubmit = useMemo(() => Boolean(file && !isSubmitting), [file, isSubmitting]);
@@ -59,8 +62,8 @@ export function ImageUploadFlow() {
   async function handleSubmit() {
     if (!file) return;
 
-    if (status !== 'loading' && !session?.user) {
-      showLoginWipMessage();
+    if (status !== 'loading' && !user) {
+      startGoogleLogin('/#upload');
       return;
     }
 
@@ -102,7 +105,13 @@ export function ImageUploadFlow() {
       const jobResponse = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputObjectKey: signResult.objectKey, modelName: 'fofr/color-matcher' })
+        body: JSON.stringify({
+          inputObjectKey: signResult.objectKey,
+          modelName: 'fofr/color-matcher',
+          restoreMode,
+          skinTonePriority,
+          whiteBalanceMode
+        })
       });
 
       if (!jobResponse.ok) {
@@ -141,6 +150,45 @@ export function ImageUploadFlow() {
         </label>
 
         {errorMessage ? <p className="mt-4 text-sm text-red-600">{errorMessage}</p> : null}
+        <div className="mt-5 space-y-4 rounded-2xl bg-slate-50 p-4">
+          <div>
+            <p className="text-sm font-medium text-slate-900">Restore strength</p>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {(['light', 'natural', 'strong'] as RestoreMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  className={`rounded-full border px-3 py-2 text-sm font-medium ${restoreMode === mode ? 'border-matcha-700 bg-matcha-700 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
+                  onClick={() => setRestoreMode(mode)}
+                  type="button"
+                >
+                  {mode === 'light' ? 'Light' : mode === 'natural' ? 'Natural' : 'Strong'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <label className="flex items-center gap-3 text-sm font-medium text-slate-900">
+            <input checked={skinTonePriority} onChange={(event) => setSkinTonePriority(event.target.checked)} type="checkbox" />
+            Natural skin tone priority
+          </label>
+
+          <div>
+            <p className="text-sm font-medium text-slate-900">White balance</p>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {(['soft', 'standard', 'strong'] as WhiteBalanceMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  className={`rounded-full border px-3 py-2 text-sm font-medium ${whiteBalanceMode === mode ? 'border-matcha-700 bg-matcha-700 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
+                  onClick={() => setWhiteBalanceMode(mode)}
+                  type="button"
+                >
+                  {mode === 'soft' ? 'Soft' : mode === 'standard' ? 'Standard' : 'Strong'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {errorMessage === 'INSUFFICIENT_CREDITS' ? (
           <Link className="mt-4 inline-flex rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white" href="/pricing">
             Buy credits
@@ -153,7 +201,7 @@ export function ImageUploadFlow() {
           onClick={handleSubmit}
           type="button"
         >
-          {isSubmitting ? 'Creating job...' : session?.user ? 'Restore image · 1 credit' : 'Sign in to restore'}
+          {isSubmitting ? 'Creating job...' : user ? 'Restore image · 1 credit' : 'Sign in to restore'}
         </button>
       </section>
 
@@ -163,6 +211,11 @@ export function ImageUploadFlow() {
           {job ? `Status: ${job.status} (${job.progress}%)` : 'Upload an image, sign in, and use 1 credit to create a restoration job.'}
         </p>
         {isPolling ? <p className="mt-2 text-sm text-matcha-700">Checking result...</p> : null}
+        {job?.restoreMode || job?.whiteBalanceMode || job?.skinTonePriority ? (
+          <p className="mt-2 text-sm text-slate-500">
+            {[job.restoreMode === 'light' ? 'Light restore' : job.restoreMode === 'strong' ? 'Strong restore' : 'Natural restore', job.whiteBalanceMode === 'soft' ? 'Soft white balance' : job.whiteBalanceMode === 'strong' ? 'Strong white balance' : 'Standard white balance', job.skinTonePriority ? 'Skin tone priority' : null].filter(Boolean).join(' · ')}
+          </p>
+        ) : null}
         {job?.status === 'completed' && job.outputPreviewUrl ? (
           <div className="mt-5 space-y-3">
             <img className="rounded-xl border border-slate-200" src={job.outputPreviewUrl} alt="AI restored result" />
@@ -176,7 +229,7 @@ export function ImageUploadFlow() {
   );
 }
 
-// showLoginWipMessage 提示用户当前登录功能仍在开发中。
-function showLoginWipMessage() {
-  window.alert('Feature under development. Stay tuned.');
+// startGoogleLogin 跳转到服务端 Google OAuth 发起接口。
+function startGoogleLogin(returnTo: string) {
+  window.location.assign(`/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`);
 }

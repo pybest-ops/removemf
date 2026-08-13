@@ -1,11 +1,13 @@
 import type { Job, JobStatus } from './types';
 import { getD1Database } from './cloudflareDb';
+import { parseStoredRestoreSettings } from './restoreSettings';
 
 type StoredJob = Job & {
   userId?: string;
   costCredits: number;
   inputObjectKey: string;
   outputObjectKey?: string;
+  restoreSettingsJson?: string;
   replicatePredictionId?: string;
   creditsRefunded?: boolean;
 };
@@ -19,6 +21,7 @@ type JobRow = {
   user_id?: string;
   input_object_key: string;
   output_object_key?: string;
+  restore_settings_json?: string;
   status: JobStatus;
   model_name?: string;
   cost_credits: number;
@@ -37,12 +40,17 @@ type JobRow = {
 const jobsStore = ((globalThis as JobsStoreGlobal).__removeMatchaJobs ??= new Map<string, StoredJob>());
 
 // createStoredJob 创建图片恢复任务的本地记录。
-export function createStoredJob(inputObjectKey: string, userId?: string, costCredits = 1): StoredJob {
+export function createStoredJob(inputObjectKey: string, userId?: string, costCredits = 1, restoreSettingsJson?: string): StoredJob {
   const now = new Date().toISOString();
+  const restoreSettings = parseStoredRestoreSettings(restoreSettingsJson);
   const job: StoredJob = {
     jobId: `job_${crypto.randomUUID()}`,
     userId,
     inputObjectKey,
+    restoreSettingsJson,
+    restoreMode: restoreSettings?.restoreMode,
+    skinTonePriority: restoreSettings?.skinTonePriority,
+    whiteBalanceMode: restoreSettings?.whiteBalanceMode,
     costCredits,
     status: 'queued',
     progress: 0,
@@ -56,16 +64,17 @@ export function createStoredJob(inputObjectKey: string, userId?: string, costCre
 }
 
 // createStoredJobAsync 优先把任务写入 D1，本地开发时回退到内存任务表。
-export async function createStoredJobAsync(inputObjectKey: string, userId?: string, costCredits = 1, modelName?: string) {
+export async function createStoredJobAsync(inputObjectKey: string, userId?: string, costCredits = 1, modelName?: string, restoreSettingsJson?: string) {
   const db = getD1Database();
 
-  if (!db) return createStoredJob(inputObjectKey, userId, costCredits);
+  if (!db) return createStoredJob(inputObjectKey, userId, costCredits, restoreSettingsJson);
 
   const now = new Date().toISOString();
   const job: StoredJob = {
     jobId: `job_${crypto.randomUUID()}`,
     userId,
     inputObjectKey,
+    restoreSettingsJson,
     costCredits,
     status: 'queued',
     progress: 0,
@@ -75,10 +84,10 @@ export async function createStoredJobAsync(inputObjectKey: string, userId?: stri
 
   await db
     .prepare(
-      `INSERT INTO jobs (id, user_id, input_object_key, status, model_name, cost_credits, progress, credits_refunded, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`
+      `INSERT INTO jobs (id, user_id, input_object_key, restore_settings_json, status, model_name, cost_credits, progress, credits_refunded, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`
     )
-    .bind(job.jobId, userId ?? null, inputObjectKey, job.status, modelName ?? null, costCredits, job.progress, now, now)
+    .bind(job.jobId, userId ?? null, inputObjectKey, restoreSettingsJson ?? null, job.status, modelName ?? null, costCredits, job.progress, now, now)
     .run();
 
   return job;
@@ -97,7 +106,7 @@ export async function getStoredJobAsync(jobId: string) {
 
   const row = await db
     .prepare(
-      `SELECT id, user_id, input_object_key, output_object_key, status, model_name, cost_credits, progress, error_code, error_message, input_preview_url, output_preview_url, replicate_prediction_id, credits_refunded, created_at, updated_at
+      `SELECT id, user_id, input_object_key, output_object_key, restore_settings_json, status, model_name, cost_credits, progress, error_code, error_message, input_preview_url, output_preview_url, replicate_prediction_id, credits_refunded, created_at, updated_at
        FROM jobs
        WHERE id = ?
        LIMIT 1`
@@ -139,6 +148,7 @@ export async function updateStoredJobAsync(jobId: string, patch: Partial<StoredJ
     inputPreviewUrl: 'input_preview_url',
     outputPreviewUrl: 'output_preview_url',
     outputObjectKey: 'output_object_key',
+    restoreSettingsJson: 'restore_settings_json',
     replicatePredictionId: 'replicate_prediction_id',
     creditsRefunded: 'credits_refunded'
   };
@@ -168,11 +178,17 @@ export function normalizeReplicateStatus(status: string): JobStatus {
 
 // mapJobRow 把 D1 snake_case 任务行转换成前端使用的 Job 结构。
 function mapJobRow(row: JobRow): StoredJob {
+  const restoreSettings = parseStoredRestoreSettings(row.restore_settings_json);
+
   return {
     jobId: row.id,
     userId: row.user_id,
     inputObjectKey: row.input_object_key,
     outputObjectKey: row.output_object_key,
+    restoreSettingsJson: row.restore_settings_json,
+    restoreMode: restoreSettings?.restoreMode,
+    skinTonePriority: restoreSettings?.skinTonePriority,
+    whiteBalanceMode: restoreSettings?.whiteBalanceMode,
     status: row.status,
     costCredits: row.cost_credits,
     progress: row.progress,

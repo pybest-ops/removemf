@@ -1,15 +1,21 @@
 import Link from 'next/link';
+import { getStoredJobAsync } from '@/lib/jobsStore';
+import { getRestoreSettingsSummary } from '@/lib/restoreSettings';
 
 // ResultPage 说明单个恢复任务结果页应展示的核对和下载信息。
-export default function ResultPage({ params }: { params: { id: string } }) {
+export default async function ResultPage({ params }: { params: { id: string } }) {
+  const job = await getStoredJobAsync(params.id);
+  const restoreSummary = job ? getRestoreSettingsSummary({ restoreMode: job.restoreMode ?? 'natural', skinTonePriority: job.skinTonePriority ?? false, whiteBalanceMode: job.whiteBalanceMode ?? 'standard' }) : [];
+
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-6 py-10">
       <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-black/5">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Result</p>
-        <h1 className="mt-3 text-4xl font-semibold text-slate-950">Review your natural restoration result.</h1>
+        <h1 className="mt-3 text-4xl font-semibold text-slate-950">Review your restoration result.</h1>
         <p className="mt-4 max-w-3xl leading-7 text-slate-600">
-          Job ID: <span className="font-mono text-slate-800">{params.id}</span>. This page explains what a completed result should show while the live preview is fetched by the upload flow.
+          Job ID: <span className="font-mono text-slate-800">{params.id}</span>. {job ? 'This page reflects the final stored job settings and download state.' : 'This job was not found.'}
         </p>
+        {restoreSummary.length ? <p className="mt-3 text-sm text-slate-500">{restoreSummary.join(' · ')}</p> : null}
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -31,7 +37,7 @@ export default function ResultPage({ params }: { params: { id: string } }) {
             <p>Use the result only if the color balance meets your needs.</p>
             <p>Check the Refund Policy before buying paid credits.</p>
           </div>
-          <Link className="mt-7 inline-flex rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white" href="/#upload">
+          <Link className="mt-7 inline-flex rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white" href="/upload">
             Restore another photo
           </Link>
         </aside>

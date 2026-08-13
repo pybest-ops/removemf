@@ -75,12 +75,16 @@ export async function getCreditBalanceAsync(userId: string) {
 
   if (!db) return getCreditBalance(userId);
 
-  const row = await db
-    .prepare('SELECT COALESCE(SUM(delta), 0) AS credits_balance FROM credit_ledger WHERE user_id = ?')
-    .bind(userId)
-    .first<{ credits_balance: number }>();
+  try {
+    const row = await db
+      .prepare('SELECT COALESCE(SUM(delta), 0) AS credits_balance FROM credit_ledger WHERE user_id = ?')
+      .bind(userId)
+      .first<{ credits_balance: number }>();
 
-  return Number(row?.credits_balance ?? 0);
+    return Number(row?.credits_balance ?? 0);
+  } catch {
+    return getCreditBalance(userId);
+  }
 }
 
 // getUserBillingSnapshot 返回账户页需要的余额、有效积分包、订单和流水。
@@ -106,39 +110,43 @@ export async function getUserBillingSnapshotAsync(userId: string) {
 
   if (!db) return getUserBillingSnapshot(userId);
 
-  const now = new Date().toISOString();
-  const balance = await getCreditBalanceAsync(userId);
-  const orders = await db
-    .prepare(
-      `SELECT id, provider, pack_id, amount_cents, currency, status, credits_granted, credits_remaining, credits_expires_at, created_at, paid_at, refunded_at
-       FROM orders
-       WHERE user_id = ?
-       ORDER BY created_at DESC
-       LIMIT 20`
-    )
-    .bind(userId)
-    .all<D1OrderRow>();
-  const recentOrders: PublicOrder[] = orders.results.map((order: D1OrderRow) => ({
-    id: order.id,
-    provider: order.provider,
-    packId: order.pack_id,
-    amountCents: order.amount_cents,
-    currency: order.currency,
-    status: order.status,
-    creditsGranted: order.credits_granted,
-    creditsRemaining: order.credits_remaining,
-    creditsExpiresAt: order.credits_expires_at,
-    createdAt: order.created_at,
-    paidAt: order.paid_at,
-    refundedAt: order.refunded_at
-  }));
+  try {
+    const now = new Date().toISOString();
+    const balance = await getCreditBalanceAsync(userId);
+    const orders = await db
+      .prepare(
+        `SELECT id, provider, pack_id, amount_cents, currency, status, credits_granted, credits_remaining, credits_expires_at, created_at, paid_at, refunded_at
+         FROM orders
+         WHERE user_id = ?
+         ORDER BY created_at DESC
+         LIMIT 20`
+      )
+      .bind(userId)
+      .all<D1OrderRow>();
+    const recentOrders: PublicOrder[] = orders.results.map((order: D1OrderRow) => ({
+      id: order.id,
+      provider: order.provider,
+      packId: order.pack_id,
+      amountCents: order.amount_cents,
+      currency: order.currency,
+      status: order.status,
+      creditsGranted: order.credits_granted,
+      creditsRemaining: order.credits_remaining,
+      creditsExpiresAt: order.credits_expires_at,
+      createdAt: order.created_at,
+      paidAt: order.paid_at,
+      refundedAt: order.refunded_at
+    }));
 
-  return {
-    creditsBalance: balance,
-    activePacks: recentOrders.filter((order) => order.status === 'paid' && order.creditsRemaining > 0 && order.creditsExpiresAt > now),
-    recentOrders,
-    creditLedger: []
-  };
+    return {
+      creditsBalance: balance,
+      activePacks: recentOrders.filter((order) => order.status === 'paid' && order.creditsRemaining > 0 && order.creditsExpiresAt > now),
+      recentOrders,
+      creditLedger: []
+    };
+  } catch {
+    return getUserBillingSnapshot(userId);
+  }
 }
 
 // upsertUser 确保 Google 登录用户在 D1 users 表中存在。
@@ -149,14 +157,18 @@ export async function upsertUser(user: { id: string; email: string; name?: strin
 
   const now = new Date().toISOString();
 
-  await db
-    .prepare(
-      `INSERT INTO users (id, email, name, image, created_at, updated_at, last_seen_at, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
-       ON CONFLICT(id) DO UPDATE SET email = excluded.email, name = excluded.name, image = excluded.image, updated_at = excluded.updated_at, last_seen_at = excluded.last_seen_at`
-    )
-    .bind(user.id, user.email, user.name ?? null, user.image ?? null, now, now, now)
-    .run();
+  try {
+    await db
+      .prepare(
+        `INSERT INTO users (id, email, name, image, created_at, updated_at, last_seen_at, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
+         ON CONFLICT(id) DO UPDATE SET email = excluded.email, name = excluded.name, image = excluded.image, updated_at = excluded.updated_at, last_seen_at = excluded.last_seen_at`
+      )
+      .bind(user.id, user.email, user.name ?? null, user.image ?? null, now, now, now)
+      .run();
+  } catch {
+    return;
+  }
 }
 
 // createPendingOrder 记录 PayPal approval 前的待支付订单。
@@ -194,36 +206,40 @@ export async function createPendingOrderAsync(params: { userId: string; paypalOr
 
   if (!db) return createPendingOrder(params);
 
-  const existingOrder = await getOrderByPayPalOrderIdAsync(params.paypalOrderId);
+  try {
+    const existingOrder = await getOrderByPayPalOrderIdAsync(params.paypalOrderId);
 
-  if (existingOrder) return existingOrder;
+    if (existingOrder) return existingOrder;
 
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + params.pack.expiresInDays * 24 * 60 * 60 * 1000);
-  const order: StoredOrder = {
-    id: `order_${crypto.randomUUID()}`,
-    userId: params.userId,
-    provider: 'paypal',
-    paypalOrderId: params.paypalOrderId,
-    packId: params.pack.id,
-    amountCents: params.pack.priceCents,
-    currency: 'USD',
-    status: 'pending',
-    creditsGranted: params.pack.credits,
-    creditsRemaining: 0,
-    creditsExpiresAt: expiresAt.toISOString(),
-    createdAt: now.toISOString()
-  };
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + params.pack.expiresInDays * 24 * 60 * 60 * 1000);
+    const order: StoredOrder = {
+      id: `order_${crypto.randomUUID()}`,
+      userId: params.userId,
+      provider: 'paypal',
+      paypalOrderId: params.paypalOrderId,
+      packId: params.pack.id,
+      amountCents: params.pack.priceCents,
+      currency: 'USD',
+      status: 'pending',
+      creditsGranted: params.pack.credits,
+      creditsRemaining: 0,
+      creditsExpiresAt: expiresAt.toISOString(),
+      createdAt: now.toISOString()
+    };
 
-  await db
-    .prepare(
-      `INSERT INTO orders (id, user_id, provider, paypal_order_id, pack_id, amount_cents, currency, status, credits_granted, credits_remaining, credits_expires_at, created_at)
-       VALUES (?, ?, 'paypal', ?, ?, ?, 'USD', 'pending', ?, 0, ?, ?)`
-    )
-    .bind(order.id, order.userId, order.paypalOrderId, order.packId, order.amountCents, order.creditsGranted, order.creditsExpiresAt, order.createdAt)
-    .run();
+    await db
+      .prepare(
+        `INSERT INTO orders (id, user_id, provider, paypal_order_id, pack_id, amount_cents, currency, status, credits_granted, credits_remaining, credits_expires_at, created_at)
+         VALUES (?, ?, 'paypal', ?, ?, ?, 'USD', 'pending', ?, 0, ?, ?)`
+      )
+      .bind(order.id, order.userId, order.paypalOrderId, order.packId, order.amountCents, order.creditsGranted, order.creditsExpiresAt, order.createdAt)
+      .run();
 
-  return order;
+    return order;
+  } catch {
+    return createPendingOrder(params);
+  }
 }
 
 // markOrderPaid 幂等确认订单支付成功，并给用户发放积分。
@@ -253,27 +269,31 @@ export async function markOrderPaidAsync(params: { paypalOrderId: string; paypal
 
   if (!db) return markOrderPaid(params);
 
-  const order = await getOrderByPayPalOrderIdAsync(params.paypalOrderId);
+  try {
+    const order = await getOrderByPayPalOrderIdAsync(params.paypalOrderId);
 
-  if (!order) return null;
-  if (order.status === 'paid') return order;
+    if (!order) return null;
+    if (order.status === 'paid') return order;
 
-  const paidAt = new Date().toISOString();
+    const paidAt = new Date().toISOString();
 
-  await db
-    .prepare(`UPDATE orders SET status = 'paid', paypal_capture_id = ?, credits_remaining = credits_granted, paid_at = ? WHERE paypal_order_id = ?`)
-    .bind(params.paypalCaptureId ?? null, paidAt, params.paypalOrderId)
-    .run();
+    await db
+      .prepare(`UPDATE orders SET status = 'paid', paypal_capture_id = ?, credits_remaining = credits_granted, paid_at = ? WHERE paypal_order_id = ?`)
+      .bind(params.paypalCaptureId ?? null, paidAt, params.paypalOrderId)
+      .run();
 
-  await appendLedgerAsync({ userId: order.userId, orderId: order.id, delta: order.creditsGranted, reason: 'topup' });
+    await appendLedgerAsync({ userId: order.userId, orderId: order.id, delta: order.creditsGranted, reason: 'topup' });
 
-  return {
-    ...order,
-    status: 'paid' as const,
-    paypalCaptureId: params.paypalCaptureId ?? order.paypalCaptureId,
-    creditsRemaining: order.creditsGranted,
-    paidAt
-  };
+    return {
+      ...order,
+      status: 'paid' as const,
+      paypalCaptureId: params.paypalCaptureId ?? order.paypalCaptureId,
+      creditsRemaining: order.creditsGranted,
+      paidAt
+    };
+  } catch {
+    return markOrderPaid(params);
+  }
 }
 
 // consumeCredits 为创建 AI 任务扣减积分，余额不足时返回 null。
@@ -338,51 +358,55 @@ export async function getOrderByPayPalOrderIdAsync(paypalOrderId: string) {
 
   if (!db) return getOrderByPayPalOrderId(paypalOrderId);
 
-  const row = await db
-    .prepare(
-      `SELECT id, user_id, provider, paypal_order_id, paypal_capture_id, pack_id, amount_cents, currency, status, credits_granted, credits_remaining, credits_expires_at, created_at, paid_at, refunded_at
-       FROM orders
-       WHERE paypal_order_id = ?
-       LIMIT 1`
-    )
-    .bind(paypalOrderId)
-    .first<{
-      id: string;
-      user_id: string;
-      provider: 'paypal';
-      paypal_order_id: string;
-      paypal_capture_id?: string;
-      pack_id: CreditPack['id'];
-      amount_cents: number;
-      currency: 'USD';
-      status: OrderStatus;
-      credits_granted: number;
-      credits_remaining: number;
-      credits_expires_at: string;
-      created_at: string;
-      paid_at?: string;
-      refunded_at?: string;
-    }>();
+  try {
+    const row = await db
+      .prepare(
+        `SELECT id, user_id, provider, paypal_order_id, paypal_capture_id, pack_id, amount_cents, currency, status, credits_granted, credits_remaining, credits_expires_at, created_at, paid_at, refunded_at
+         FROM orders
+         WHERE paypal_order_id = ?
+         LIMIT 1`
+      )
+      .bind(paypalOrderId)
+      .first<{
+        id: string;
+        user_id: string;
+        provider: 'paypal';
+        paypal_order_id: string;
+        paypal_capture_id?: string;
+        pack_id: CreditPack['id'];
+        amount_cents: number;
+        currency: 'USD';
+        status: OrderStatus;
+        credits_granted: number;
+        credits_remaining: number;
+        credits_expires_at: string;
+        created_at: string;
+        paid_at?: string;
+        refunded_at?: string;
+      }>();
 
-  if (!row) return null;
+    if (!row) return null;
 
-  return {
-    id: row.id,
-    userId: row.user_id,
-    provider: row.provider,
-    paypalOrderId: row.paypal_order_id,
-    paypalCaptureId: row.paypal_capture_id,
-    packId: row.pack_id,
-    amountCents: row.amount_cents,
-    currency: row.currency,
-    status: row.status,
-    creditsGranted: row.credits_granted,
-    creditsRemaining: row.credits_remaining,
-    creditsExpiresAt: row.credits_expires_at,
-    createdAt: row.created_at,
-    paidAt: row.paid_at,
-    refundedAt: row.refunded_at
-  };
+    return {
+      id: row.id,
+      userId: row.user_id,
+      provider: row.provider,
+      paypalOrderId: row.paypal_order_id,
+      paypalCaptureId: row.paypal_capture_id,
+      packId: row.pack_id,
+      amountCents: row.amount_cents,
+      currency: row.currency,
+      status: row.status,
+      creditsGranted: row.credits_granted,
+      creditsRemaining: row.credits_remaining,
+      creditsExpiresAt: row.credits_expires_at,
+      createdAt: row.created_at,
+      paidAt: row.paid_at,
+      refundedAt: row.refunded_at
+    };
+  } catch {
+    return getOrderByPayPalOrderId(paypalOrderId);
+  }
 }
 
 // markWebhookEventProcessed 记录已处理的 PayPal webhook 事件，保证幂等。
@@ -418,24 +442,28 @@ async function appendLedgerAsync(params: { userId: string; jobId?: string; order
 
   if (!db) return appendLedger(params);
 
-  const balanceAfter = (await getCreditBalanceAsync(params.userId)) + params.delta;
-  const entry: LedgerEntry = {
-    id: `ledger_${crypto.randomUUID()}`,
-    userId: params.userId,
-    jobId: params.jobId,
-    orderId: params.orderId,
-    delta: params.delta,
-    reason: params.reason,
-    balanceAfter,
-    createdAt: new Date().toISOString()
-  };
+  try {
+    const balanceAfter = (await getCreditBalanceAsync(params.userId)) + params.delta;
+    const entry: LedgerEntry = {
+      id: `ledger_${crypto.randomUUID()}`,
+      userId: params.userId,
+      jobId: params.jobId,
+      orderId: params.orderId,
+      delta: params.delta,
+      reason: params.reason,
+      balanceAfter,
+      createdAt: new Date().toISOString()
+    };
 
-  await db
-    .prepare('INSERT INTO credit_ledger (id, user_id, job_id, order_id, delta, reason, balance_after, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-    .bind(entry.id, entry.userId, entry.jobId ?? null, entry.orderId ?? null, entry.delta, entry.reason, entry.balanceAfter, entry.createdAt)
-    .run();
+    await db
+      .prepare('INSERT INTO credit_ledger (id, user_id, job_id, order_id, delta, reason, balance_after, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(entry.id, entry.userId, entry.jobId ?? null, entry.orderId ?? null, entry.delta, entry.reason, entry.balanceAfter, entry.createdAt)
+      .run();
 
-  return entry;
+    return entry;
+  } catch {
+    return appendLedger(params);
+  }
 }
 
 // decrementPaidOrderCreditsAsync 从 D1 中最早过期的付费包扣减可用 credits。
@@ -447,23 +475,27 @@ async function decrementPaidOrderCreditsAsync(userId: string, credits: number) {
     return;
   }
 
-  let remainingCredits = credits;
-  const orders = await db
-    .prepare(
-      `SELECT id, credits_remaining
-       FROM orders
-       WHERE user_id = ? AND status = 'paid' AND credits_remaining > 0
-       ORDER BY credits_expires_at ASC`
-    )
-    .bind(userId)
-    .all<{ id: string; credits_remaining: number }>();
+  try {
+    let remainingCredits = credits;
+    const orders = await db
+      .prepare(
+        `SELECT id, credits_remaining
+         FROM orders
+         WHERE user_id = ? AND status = 'paid' AND credits_remaining > 0
+         ORDER BY credits_expires_at ASC`
+      )
+      .bind(userId)
+      .all<{ id: string; credits_remaining: number }>();
 
-  for (const order of orders.results) {
-    if (remainingCredits <= 0) break;
+    for (const order of orders.results) {
+      if (remainingCredits <= 0) break;
 
-    const usedCredits = Math.min(order.credits_remaining, remainingCredits);
-    await db.prepare('UPDATE orders SET credits_remaining = credits_remaining - ? WHERE id = ?').bind(usedCredits, order.id).run();
-    remainingCredits -= usedCredits;
+      const usedCredits = Math.min(order.credits_remaining, remainingCredits);
+      await db.prepare('UPDATE orders SET credits_remaining = credits_remaining - ? WHERE id = ?').bind(usedCredits, order.id).run();
+      remainingCredits -= usedCredits;
+    }
+  } catch {
+    decrementPaidOrderCredits(userId, credits);
   }
 }
 
