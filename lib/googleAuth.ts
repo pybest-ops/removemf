@@ -1,3 +1,5 @@
+import { getEnvValue } from './env';
+
 // GoogleOAuthConfig 是 Google OAuth 服务端交换 code 所需的私密配置。
 type GoogleOAuthConfig = {
   clientId: string;
@@ -65,9 +67,9 @@ const googleCertsUrl = 'https://www.googleapis.com/oauth2/v3/certs';
 
 // getGoogleOAuthConfig 校验 Google 登录所需的服务端配置是否齐全。
 export function getGoogleOAuthConfig(): GoogleOAuthConfig | null {
-  const clientId = process.env.AUTH_GOOGLE_ID ?? process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.AUTH_GOOGLE_SECRET ?? process.env.GOOGLE_CLIENT_SECRET;
-  const sessionSecret = process.env.AUTH_SECRET;
+  const clientId = getEnvValue('AUTH_GOOGLE_ID') ?? getEnvValue('GOOGLE_CLIENT_ID');
+  const clientSecret = getEnvValue('AUTH_GOOGLE_SECRET') ?? getEnvValue('GOOGLE_CLIENT_SECRET');
+  const sessionSecret = getEnvValue('AUTH_SECRET');
 
   if (!clientId || !clientSecret || !sessionSecret) return null;
 

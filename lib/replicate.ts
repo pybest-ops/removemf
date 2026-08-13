@@ -1,4 +1,5 @@
 import type { RestoreModelInput } from './restoreSettings';
+import { getEnvValue } from './env';
 
 type ReplicatePredictionInput = {
   input_image: string;
@@ -29,9 +30,9 @@ const defaultImageEditModelPath = 'black-forest-labs/flux-kontext-pro';
 
 // createReplicatePrediction 创建 Replicate 图片恢复预测任务。
 export async function createReplicatePrediction(inputImageUrl: string, restoreModelInput?: RestoreModelInput, webhookUrl?: string) {
-  const apiToken = process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_TOKEN_PRIVATE;
-  const modelPath = process.env.REPLICATE_IMAGE_EDIT_MODEL ?? defaultImageEditModelPath;
-  const modelVersion = process.env.REPLICATE_IMAGE_EDIT_VERSION;
+  const apiToken = getEnvValue('REPLICATE_API_TOKEN') ?? getEnvValue('REPLICATE_API_TOKEN_PRIVATE');
+  const modelPath = getEnvValue('REPLICATE_IMAGE_EDIT_MODEL') ?? defaultImageEditModelPath;
+  const modelVersion = getEnvValue('REPLICATE_IMAGE_EDIT_VERSION');
 
   if (!apiToken) throw new Error('REPLICATE_API_TOKEN is required');
 
@@ -72,7 +73,7 @@ export async function createReplicatePrediction(inputImageUrl: string, restoreMo
 
 // getReplicatePrediction 查询 Replicate prediction 的最新状态。
 export async function getReplicatePrediction(predictionId: string) {
-  const apiToken = process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_TOKEN_PRIVATE;
+  const apiToken = getEnvValue('REPLICATE_API_TOKEN') ?? getEnvValue('REPLICATE_API_TOKEN_PRIVATE');
 
   if (!apiToken) throw new Error('REPLICATE_API_TOKEN is required');
 

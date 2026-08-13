@@ -1,5 +1,6 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { getEnvValue } from './env';
 
 export type R2UploadTarget = {
   uploadUrl: string;
@@ -20,10 +21,10 @@ const downloadUrlTtlSeconds = 10 * 60;
 
 // getR2Config 读取 R2 S3 API 所需配置；缺任一项则返回 null 走本地 fallback。
 function getR2Config(): R2Config | null {
-  const accountId = process.env.R2_ACCOUNT_ID ?? process.env.CLOUDFLARE_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const bucketName = process.env.R2_BUCKET_NAME;
+  const accountId = getEnvValue('R2_ACCOUNT_ID') ?? getEnvValue('CLOUDFLARE_ACCOUNT_ID');
+  const accessKeyId = getEnvValue('R2_ACCESS_KEY_ID');
+  const secretAccessKey = getEnvValue('R2_SECRET_ACCESS_KEY');
+  const bucketName = getEnvValue('R2_BUCKET_NAME');
 
   if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) return null;
 

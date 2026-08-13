@@ -1,4 +1,5 @@
 import type { CreditPack } from './pricing';
+import { getEnvValue } from './env';
 
 type PayPalLink = {
   href: string;
@@ -31,7 +32,7 @@ const paypalApiBaseUrls = {
 
 // isPayPalConfigured 表示当前环境是否具备真实 PayPal Checkout 能力。
 export function isPayPalConfigured() {
-  return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+  return Boolean(getEnvValue('PAYPAL_CLIENT_ID') && getEnvValue('PAYPAL_CLIENT_SECRET'));
 }
 
 // createPayPalOrder 为指定积分包创建 PayPal Checkout 订单。
@@ -105,7 +106,7 @@ export async function capturePayPalOrder(orderId: string) {
 
 // verifyPayPalWebhook 通过 PayPal API 验证 webhook 签名；未配置时拒绝生产处理。
 export async function verifyPayPalWebhook(request: Request, body: unknown) {
-  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  const webhookId = getEnvValue('PAYPAL_WEBHOOK_ID');
 
   if (!webhookId || !isPayPalConfigured()) return false;
 
@@ -132,8 +133,8 @@ export async function verifyPayPalWebhook(request: Request, body: unknown) {
 
 // getPayPalAccessToken 使用 client credentials 换取 PayPal access token。
 async function getPayPalAccessToken() {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+  const clientId = getEnvValue('PAYPAL_CLIENT_ID');
+  const clientSecret = getEnvValue('PAYPAL_CLIENT_SECRET');
 
   if (!clientId || !clientSecret) throw new Error('PayPal credentials are required');
 
@@ -169,7 +170,7 @@ async function createPayPalHeaders() {
 
 // getPayPalBaseUrl 根据环境变量选择 PayPal sandbox 或 live API。
 function getPayPalBaseUrl() {
-  const paypalEnvironment = process.env.PAYPAL_ENV ?? process.env.PAYPAL_ENVIRONMENT;
+  const paypalEnvironment = getEnvValue('PAYPAL_ENV') ?? getEnvValue('PAYPAL_ENVIRONMENT');
 
   return paypalEnvironment === 'live' ? paypalApiBaseUrls.live : paypalApiBaseUrls.sandbox;
 }

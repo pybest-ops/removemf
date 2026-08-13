@@ -1,5 +1,6 @@
 import { getAuthenticatedUser } from '@/lib/authUser';
 import { consumeCreditsAsync, upsertUser } from '@/lib/billingStore';
+import { getEnvValue } from '@/lib/env';
 import { createStoredJobAsync, updateStoredJobAsync } from '@/lib/jobsStore';
 import { jobCostCredits } from '@/lib/pricing';
 import { createReplicatePrediction } from '@/lib/replicate';
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const replicateApiToken = process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_TOKEN_PRIVATE;
+    const replicateApiToken = getEnvValue('REPLICATE_API_TOKEN') ?? getEnvValue('REPLICATE_API_TOKEN_PRIVATE');
     const inputImageUrl = await getPublicInputUrl(inputObjectKey);
     const referenceImageUrl = restoreSettings.referenceObjectKey ? await getPublicInputUrl(restoreSettings.referenceObjectKey) : undefined;
     const restoreModelInput = {
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const webhookBaseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_PUBLIC_BASE_URL;
+    const webhookBaseUrl = getEnvValue('NEXT_PUBLIC_APP_URL') ?? getEnvValue('APP_PUBLIC_BASE_URL');
     const webhookUrl = webhookBaseUrl?.startsWith('https://')
       ? `${webhookBaseUrl}/api/replicate/webhook?jobId=${job.jobId}`
       : undefined;
