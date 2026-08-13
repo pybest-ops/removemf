@@ -1,0 +1,26 @@
+lib/replicate.ts
+  s_571cc6d3d1fba8::t_6cdf89de2e2446 2,33-35,76
+lib/r2.ts
+  s_571cc6d3d1fba8::t_6cdf89de2e2446 3,24-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "01873b2515702a524ac679b00ae6f2b7836a514b",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_571cc6d3d1fba8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffbe1-fd26-7741-852d-bb629eaef1f9",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
