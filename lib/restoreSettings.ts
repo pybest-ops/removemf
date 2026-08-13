@@ -8,10 +8,11 @@ export type RestoreSettingsInput = {
 };
 
 export type RestoreModelInput = {
-  method: 'mkl';
-  strength: number;
-  fix_white_balance: true;
-  white_balance_percentile: number;
+  prompt: string;
+  aspect_ratio: 'match_input_image';
+  output_format: 'png';
+  safety_tolerance: 2;
+  prompt_upsampling: boolean;
   reference_image?: string;
 };
 
@@ -23,16 +24,16 @@ export type RestoreSettings = {
   modelInput: RestoreModelInput;
 };
 
-const restoreModeStrength: Record<RestoreMode, number> = {
-  light: 0.25,
-  natural: 0.45,
-  strong: 0.7
+const restoreModePrompt: Record<RestoreMode, string> = {
+  light: 'Apply a conservative restoration. Reduce the green and yellow matcha color cast while keeping the original photographic detail and lighting close to the input.',
+  natural: 'Restore the image into a natural realistic photograph. Remove the matcha-style green/yellow color cast, reduce the artificial filter look, recover neutral whites, realistic material colors, and natural skin tones.',
+  strong: 'Aggressively convert the matcha-tinted stylized image into a realistic natural photograph. Remove the green/yellow cast and painterly filtered texture, restore believable real-world lighting, true whites, natural skin tones, and photographic detail.'
 };
 
-const whiteBalancePercentile: Record<WhiteBalanceMode, number> = {
-  soft: 90,
-  standard: 95,
-  strong: 98
+const whiteBalancePrompt: Record<WhiteBalanceMode, string> = {
+  soft: 'Use a gentle white balance correction and avoid overcorrecting warm ambient light.',
+  standard: 'Use standard neutral white balance so whites and grays no longer appear green or yellow.',
+  strong: 'Use strong neutral white balance correction, especially in highlights, walls, windows, clothing, skin, and white objects.'
 };
 
 // buildRestoreSettings 把用户可理解的恢复设置转换成模型入参。
@@ -41,8 +42,7 @@ export function buildRestoreSettings(input: RestoreSettingsInput = {}): RestoreS
   const whiteBalanceMode = isWhiteBalanceMode(input.whiteBalanceMode) ? input.whiteBalanceMode : 'standard';
   const skinTonePriority = input.skinTonePriority === true;
   const referenceObjectKey = typeof input.referenceObjectKey === 'string' && input.referenceObjectKey ? input.referenceObjectKey : undefined;
-  const baseStrength = restoreModeStrength[restoreMode];
-  const strength = skinTonePriority ? Math.min(baseStrength, 0.5) : baseStrength;
+  const prompt = buildRestorePrompt({ restoreMode, skinTonePriority, whiteBalanceMode });
 
   return {
     restoreMode,
@@ -50,12 +50,25 @@ export function buildRestoreSettings(input: RestoreSettingsInput = {}): RestoreS
     whiteBalanceMode,
     referenceObjectKey,
     modelInput: {
-      method: 'mkl',
-      strength,
-      fix_white_balance: true,
-      white_balance_percentile: whiteBalancePercentile[whiteBalanceMode]
+      prompt,
+      aspect_ratio: 'match_input_image',
+      output_format: 'png',
+      safety_tolerance: 2,
+      prompt_upsampling: true
     }
   };
+}
+
+// buildRestorePrompt 生成图像编辑模型使用的还原指令。
+function buildRestorePrompt(settings: Pick<RestoreSettings, 'restoreMode' | 'skinTonePriority' | 'whiteBalanceMode'>) {
+  return [
+    restoreModePrompt[settings.restoreMode],
+    whiteBalancePrompt[settings.whiteBalanceMode],
+    settings.skinTonePriority ? 'Prioritize realistic human skin tones and do not leave skin green, yellow, gray, or waxy.' : null,
+    'Preserve the same scene layout, camera angle, subject placement, pose, objects, framing, and perspective.',
+    'Do not add new objects, remove important objects, change the person identity, change the composition, add text, or turn the image into a painting, anime, illustration, CGI, or fantasy scene.',
+    'The result should look like a plausible unfiltered real photo of the same scene.'
+  ].filter(Boolean).join(' ');
 }
 
 // getRestoreSettingsSummary 生成结果页和状态卡使用的用户可读摘要。

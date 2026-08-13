@@ -37,11 +37,7 @@ export function isPayPalConfigured() {
 // createPayPalOrder 为指定积分包创建 PayPal Checkout 订单。
 export async function createPayPalOrder(params: { pack: CreditPack; userId: string; returnUrl: string; cancelUrl: string }) {
   if (!isPayPalConfigured()) {
-    return {
-      orderId: `mock_paypal_${crypto.randomUUID()}`,
-      approvalUrl: params.returnUrl,
-      mock: true
-    };
+    throw new Error('PayPal credentials are required');
   }
 
   const response = await fetch(`${getPayPalBaseUrl()}/v2/checkout/orders`, {
@@ -84,14 +80,7 @@ export async function createPayPalOrder(params: { pack: CreditPack; userId: stri
 
 // capturePayPalOrder 在 PayPal 回跳后服务端确认扣款结果。
 export async function capturePayPalOrder(orderId: string) {
-  if (orderId.startsWith('mock_paypal_') || !isPayPalConfigured()) {
-    return {
-      orderId,
-      captureId: `mock_capture_${crypto.randomUUID()}`,
-      status: 'COMPLETED',
-      mock: true
-    };
-  }
+  if (!isPayPalConfigured()) throw new Error('PayPal credentials are required');
 
   const response = await fetch(`${getPayPalBaseUrl()}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, {
     method: 'POST',

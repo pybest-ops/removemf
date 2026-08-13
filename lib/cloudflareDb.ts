@@ -13,14 +13,16 @@ function isLocalBaseUrl() {
 
 // getD1Database 在 Cloudflare runtime 中读取 DB binding；本地 next dev 缺失时返回 null。
 export function getD1Database() {
-  if (isLocalBaseUrl()) return null;
-
   try {
     const context = getCloudflareContext({ async: false });
     const env = context.env as EnvWithDb;
 
-    return env.DB ?? null;
+    if (env.DB) return env.DB;
   } catch {
-    return null;
+    // next dev 没有初始化 Cloudflare context 时继续按本地环境处理。
   }
+
+  if (isLocalBaseUrl()) return null;
+
+  return null;
 }

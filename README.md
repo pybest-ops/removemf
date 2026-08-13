@@ -39,3 +39,10 @@ R2 真实上传和结果持久化需要：
 - 已有 Replicate prediction 创建和状态刷新适配
 - 已有 R2 签名上传、签名读取和结果持久化适配
 - D1、Queue 当前仍是占位适配，尚未接真实 Cloudflare 资源
+
+# PayPal本地报错
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
+pnpm run cf:dev
+
+# preview环境
+https://upload-checkout-matcha-filter-remover.pengyongbest.workers.dev

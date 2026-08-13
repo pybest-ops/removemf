@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ errorCode: 'INVALID_REFERENCE_OBJECT' }, { status: 400 });
     }
 
-    const modelName = String(body.modelName ?? 'fofr/color-matcher');
+    const modelName = String(body.modelName ?? 'black-forest-labs/flux-kontext-pro');
     const restoreSettingsJson = serializeRestoreSettings(restoreSettings);
     const job = await createStoredJobAsync(inputObjectKey, user.id, jobCostCredits, modelName, restoreSettingsJson);
     const consumedCredit = await consumeCreditsAsync({ userId: user.id, jobId: job.jobId, credits: jobCostCredits });

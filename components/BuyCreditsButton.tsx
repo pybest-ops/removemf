@@ -37,7 +37,7 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
       window.location.href = result.approvalUrl;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to start checkout.';
-      setErrorMessage(message.includes('PayPal') ? `${message} This environment should fall back to mock checkout.` : message);
+      setErrorMessage(message);
       setIsLoading(false);
     }
   }

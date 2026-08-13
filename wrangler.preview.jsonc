@@ -1,15 +1,14 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "matcha-filter-remover",
+  "name": "upload-checkout-matcha-filter-remover",
   "main": ".open-next/worker.js",
   "workers_dev": true,
   "preview_urls": true,
   "compatibility_date": "2026-08-11",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "NEXT_PUBLIC_APP_URL": "https://removematchafilter.org",
-    "AUTH_TRUST_HOST": "true",
-    "PAYPAL_ENV": "live"
+    "NEXT_PUBLIC_APP_URL": "https://upload-checkout-matcha-filter-remover.pengyongbest.workers.dev",
+    "AUTH_TRUST_HOST": "true"
   },
   "assets": {
     "directory": ".open-next/assets",
@@ -21,16 +20,6 @@
       "database_name": "matcha-filter-remover",
       "database_id": "444c33d7-0154-4a73-8118-54c4bc02691d",
       "migrations_dir": "migrations"
-    }
-  ],
-  "routes": [
-    {
-      "pattern": "removematchafilter.org",
-      "custom_domain": true
-    },
-    {
-      "pattern": "www.removematchafilter.org",
-      "custom_domain": true
     }
   ],
   "observability": {

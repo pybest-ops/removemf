@@ -209,7 +209,7 @@ export function UploadPageFlow() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           inputObjectKey: signResult.objectKey,
-          modelName: 'fofr/color-matcher',
+          modelName: 'black-forest-labs/flux-kontext-pro',
           restoreMode,
           skinTonePriority,
           whiteBalanceMode
@@ -279,12 +279,6 @@ export function UploadPageFlow() {
 
         {file ? (
           <>
-            <div className="mt-3 grid gap-3 md:grid-cols-3">
-              <InfoCard title="What it fixes" text="Greenish and yellowish matcha-style casts that make photos look flat or melted." />
-              <InfoCard title="What to expect" text="A cleaner preview first, then a stronger AI pass if you want more correction." />
-              <InfoCard title="Privacy" text="The free cleanup stays in your browser; AI Restore only processes the uploaded file." />
-            </div>
-
             <section className="mt-4 rounded-2xl bg-slate-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -394,6 +388,30 @@ export function UploadPageFlow() {
                   </Link>
                 </div>
               </div>
+
+              {job?.status === 'completed' && job.outputPreviewUrl ? (
+                <div className="relative mt-5 rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-200">AI result ready</p>
+                      <h4 className="mt-1 text-base font-semibold text-white">Compare the original and restored image</h4>
+                    </div>
+                    <Link className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15" href={`/result/${job.jobId}`}>
+                      Open full result
+                    </Link>
+                  </div>
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <figure>
+                      <img className="max-h-72 w-full rounded-xl bg-slate-950 object-contain" src={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} alt="Original before AI restore" />
+                      <figcaption className="mt-2 text-xs font-medium text-slate-300">Before</figcaption>
+                    </figure>
+                    <figure>
+                      <img className="max-h-72 w-full rounded-xl bg-slate-950 object-contain" src={job.outputPreviewUrl} alt="AI restored result" />
+                      <figcaption className="mt-2 text-xs font-medium text-slate-300">After · AI restored</figcaption>
+                    </figure>
+                  </div>
+                </div>
+              ) : null}
             </section>
           </>
         ) : null}
@@ -416,11 +434,6 @@ export function UploadPageFlow() {
           </p>
         ) : null}
         {isPolling ? <p className="mt-1 text-matcha-700">Checking result...</p> : null}
-        {job?.status === 'completed' && job.outputPreviewUrl ? (
-          <Link className="mt-3 inline-flex rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white" href={`/result/${job.jobId}`}>
-            View result
-          </Link>
-        ) : null}
       </div>
     </div>
   );

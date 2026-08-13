@@ -76,8 +76,7 @@ export function getGoogleOAuthConfig(): GoogleOAuthConfig | null {
 
 // getGoogleRedirectUri 生成 Google Console 中必须配置的完整回调地址。
 export function getGoogleRedirectUri(request: Request) {
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_PUBLIC_BASE_URL)?.replace(/\/$/, '') ?? new URL(request.url).origin;
-  return `${baseUrl}/api/auth/google/callback`;
+  return `${new URL(request.url).origin}/api/auth/google/callback`;
 }
 
 // sanitizeReturnTo 限制 OAuth 登录后只能回跳站内安全路径。
@@ -275,7 +274,7 @@ function timingSafeEqual(first: string, second: string) {
 
 // isSecureRequest 判断当前请求是否应使用 Secure cookie。
 function isSecureRequest(request: Request) {
-  const url = new URL((process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_PUBLIC_BASE_URL) || request.url);
+  const url = new URL(request.url);
   return url.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https';
 }
 

@@ -2,11 +2,12 @@ import type { RestoreModelInput } from './restoreSettings';
 
 type ReplicatePredictionInput = {
   input_image: string;
-  method?: RestoreModelInput['method'];
-  strength?: number;
-  fix_white_balance?: boolean;
-  white_balance_percentile?: number;
+  aspect_ratio?: RestoreModelInput['aspect_ratio'];
+  output_format?: RestoreModelInput['output_format'];
+  prompt?: string;
+  prompt_upsampling?: boolean;
   reference_image?: string;
+  safety_tolerance?: number;
 };
 
 type ReplicatePredictionRequest = {
@@ -24,12 +25,13 @@ type ReplicatePrediction = {
 };
 
 const replicateApiBaseUrl = 'https://api.replicate.com/v1';
-const defaultColorMatcherModelPath = 'fofr/color-matcher';
+const defaultImageEditModelPath = 'black-forest-labs/flux-kontext-pro';
 
 // createReplicatePrediction 创建 Replicate 图片恢复预测任务。
 export async function createReplicatePrediction(inputImageUrl: string, restoreModelInput?: RestoreModelInput, webhookUrl?: string) {
   const apiToken = process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_TOKEN_PRIVATE;
-  const modelVersion = process.env.REPLICATE_COLOR_MATCHER_VERSION;
+  const modelPath = process.env.REPLICATE_IMAGE_EDIT_MODEL ?? defaultImageEditModelPath;
+  const modelVersion = process.env.REPLICATE_IMAGE_EDIT_VERSION;
 
   if (!apiToken) throw new Error('REPLICATE_API_TOKEN is required');
 
@@ -49,7 +51,7 @@ export async function createReplicatePrediction(inputImageUrl: string, restoreMo
 
   const predictionUrl = modelVersion
     ? `${replicateApiBaseUrl}/predictions`
-    : `${replicateApiBaseUrl}/models/${defaultColorMatcherModelPath}/predictions`;
+    : `${replicateApiBaseUrl}/models/${modelPath}/predictions`;
 
   const response = await fetch(predictionUrl, {
     method: 'POST',

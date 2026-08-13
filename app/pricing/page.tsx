@@ -1,5 +1,6 @@
 import { BuyCreditsButton } from '@/components/BuyCreditsButton';
 import { CaptureCheckout } from '@/components/CaptureCheckout';
+import { PricingCreditsHeading } from '@/components/PricingCreditsHeading';
 import { creditPacks, formatPackPrice } from '@/lib/pricing';
 
 // PricingPage 展示无订阅积分包，并处理 PayPal 回跳后的订单捕获提示。
@@ -10,7 +11,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { token?:
 
       <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-black/5">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Credits</p>
-        <h1 className="mt-3 text-4xl font-semibold text-slate-950">Buy credits only when you need them.</h1>
+        <PricingCreditsHeading />
         <p className="mt-4 max-w-3xl leading-7 text-slate-600">
           No subscription and no free generation. Each credit creates one matcha filter removal, and unused credits stay in your account for 12 months.
         </p>

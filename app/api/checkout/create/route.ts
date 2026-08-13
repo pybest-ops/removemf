@@ -23,10 +23,10 @@ export async function POST(request: Request) {
     try {
       await upsertUser(user);
     } catch {
-      // 本地或无 D1 环境下允许继续走 mock checkout。
+      // 本地无 D1 时仍允许创建 PayPal 订单，支付记录会走 billingStore 的本地兜底。
     }
 
-    const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_PUBLIC_BASE_URL ?? new URL(request.url).origin;
+    const appBaseUrl = new URL(request.url).origin;
     const returnUrl = `${appBaseUrl}/pricing?checkout=return&packId=${pack.id}`;
     const cancelUrl = `${appBaseUrl}/pricing?checkout=cancelled`;
     const paypalOrder = await createPayPalOrder({ pack, userId: user.id, returnUrl, cancelUrl });
