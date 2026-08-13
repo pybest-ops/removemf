@@ -1,0 +1,59 @@
+app/api/checkout/create/route.ts
+  s_84bb75c5020f24::t_cb85f5707d7b87 29
+  s_84bb75c5020f24::t_ba64f995b1a225 26
+wrangler.jsonc
+  h_4b5baf569fa24a 11-12
+lib/useCurrentUser.ts
+  s_1e48478f4b17e6::t_7cba4478dd6c0c 9-12,17,25-26,34,41,48,60
+components/PricingCreditsHeading.tsx
+  s_1e48478f4b17e6::t_7cba4478dd6c0c 1-15
+lib/replicate.ts
+  ai_agent 5-8,10,28,33-34,54
+README.md
+  h_4b5baf569fa24a 42-48
+components/BuyCreditsButton.tsx
+  s_84bb75c5020f24::t_ba64f995b1a225 40
+components/UploadPageFlow.tsx
+  s_84bb75c5020f24::t_c65a46a90a6631 212
+lib/googleAuth.ts
+  s_84bb75c5020f24::t_cb85f5707d7b87 79,277
+app/pricing/page.tsx
+  s_1e48478f4b17e6::t_7cba4478dd6c0c 3,14
+wrangler.preview.jsonc
+  s_1e48478f4b17e6::t_7beb6de7ad8a12 1-28
+lib/paypal.ts
+  s_84bb75c5020f24::t_ba64f995b1a225 40,83
+package.json
+  s_1e48478f4b17e6::t_310e5b704b32ae 10
+app/api/jobs/route.ts
+  s_84bb75c5020f24::t_c65a46a90a6631 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "2e91c979d4aca9f3f69bdd0270a329165a39b111",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_1e48478f4b17e6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffbcf-8e14-7ee0-81f1-2cbf6c6ae1ca",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    },
+    "s_84bb75c5020f24": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffb3a-e381-7770-b1f4-fed76e123a7f",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
