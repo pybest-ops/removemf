@@ -4,7 +4,31 @@ import type { Metadata } from 'next';
 // metadata 承接 definition 查询，并澄清 matcha filter 在本站中的图片含义。
 export const metadata: Metadata = {
   title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained',
-  description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.'
+  description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.',
+  alternates: {
+    canonical: '/what-is-matcha-filter'
+  },
+  openGraph: {
+    title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained',
+    description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.',
+    url: '/what-is-matcha-filter',
+    siteName: 'Remove Matcha Filter',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Remove Matcha Filter before and after preview'
+      }
+    ],
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained',
+    description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.',
+    images: ['/og-image.png']
+  }
 };
 
 // symptoms 描述用户能直接识别的抹茶滤镜表现。

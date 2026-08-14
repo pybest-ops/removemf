@@ -8,8 +8,14 @@ import favicon from './assets/favicon.ico';
 import logo from './assets/logo.png';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://removematchafilter.org'),
   title: 'Remove Matcha Filter from Photos Online',
-  description: 'Remove matcha filter, green tint, yellow cast, or color cast from a photo online with free browser preview and AI Restore.',
+  description: 'Remove matcha filter, green tint, yellow cast, and muted color from photos online. Preview a free cleanup, then use AI Restore for natural results.',
+  verification: {
+    other: {
+      'msvalidate.01': 'AF12FB79EBB8DC2E5702A8B0A40BCBEA'
+    }
+  },
   icons: {
     icon: favicon.src
   }
@@ -18,7 +24,7 @@ export const metadata: Metadata = {
 // navItems 定义全站顶部导航的核心入口。
 const navItems = [
   { href: '/upload', label: 'Upload' },
-  { href: '/pricing', label: 'Credits' },
+  { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' }
 ];
 

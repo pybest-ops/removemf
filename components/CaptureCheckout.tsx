@@ -42,7 +42,7 @@ export function CaptureCheckout({ paypalOrderId }: { paypalOrderId?: string }) {
   if (!statusMessage && !errorMessage) return null;
 
   return (
-    <section className="mb-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+    <section className="mb-8 rounded-3xl border border-white/80 bg-white/70 p-6 shadow-[0_18px_50px_rgba(31,82,44,0.10)] backdrop-blur">
       {statusMessage ? <p className="font-semibold text-matcha-800">{statusMessage}</p> : null}
       {errorMessage ? <p className="font-semibold text-red-600">{errorMessage}</p> : null}
     </section>

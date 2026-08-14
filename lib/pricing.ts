@@ -18,8 +18,8 @@ export const creditPacks: CreditPack[] = [
     priceCents: 499,
     credits: 8,
     expiresInDays: 365,
-    description: 'Low-risk pack for trying a few natural photo recoveries.',
-    features: ['8 matcha filter removals', 'No subscription', 'Credits valid for 12 months']
+    description: 'Low-risk starter pack for checking how AI Restore handles your photos.',
+    features: ['8 AI Restores', 'Small starter pack', 'Good for testing results']
   },
   {
     id: 'popular_1499_45',
@@ -28,8 +28,8 @@ export const creditPacks: CreditPack[] = [
     priceCents: 1499,
     credits: 45,
     expiresInDays: 365,
-    description: 'Best fit for a small photo set or playful batch corrections.',
-    features: ['45 matcha filter removals', 'No subscription', 'Failed jobs return the credit']
+    description: 'Recommended pack for a small photo set or regular color fixes.',
+    features: ['45 AI Restores', 'Best value per small set', 'Failed jobs return the credit']
   },
   {
     id: 'pro_3999_160',
@@ -37,8 +37,8 @@ export const creditPacks: CreditPack[] = [
     priceCents: 3999,
     credits: 160,
     expiresInDays: 365,
-    description: 'For larger batches when you need more room to experiment.',
-    features: ['160 matcha filter removals', 'No subscription', '12-month credit validity']
+    description: 'Batch-friendly pack for creators or larger photo cleanup sessions.',
+    features: ['160 AI Restores', 'Lowest cost per AI Restore', 'Built for batch experiments']
   }
 ];
 

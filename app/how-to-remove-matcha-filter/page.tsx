@@ -4,7 +4,31 @@ import type { Metadata } from 'next';
 // metadata 覆盖 how-to 查询意图，帮助搜索用户理解工具能力边界。
 export const metadata: Metadata = {
   title: 'How to Remove Matcha Filter from a Photo Online',
-  description: 'Learn how to reduce a matcha filter, green tint, yellow cast, or color cast from a saved photo with browser preview and AI Restore.'
+  description: 'Learn how to remove a matcha filter from a saved photo online. Reduce green tint, yellow cast, and muted colors with preview and AI Restore.',
+  alternates: {
+    canonical: '/how-to-remove-matcha-filter'
+  },
+  openGraph: {
+    title: 'How to Remove Matcha Filter from a Photo Online',
+    description: 'Learn how to remove a matcha filter from a saved photo online. Reduce green tint, yellow cast, and muted colors with preview and AI Restore.',
+    url: '/how-to-remove-matcha-filter',
+    siteName: 'Remove Matcha Filter',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Remove Matcha Filter before and after preview'
+      }
+    ],
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How to Remove Matcha Filter from a Photo Online',
+    description: 'Learn how to remove a matcha filter from a saved photo online. Reduce green tint, yellow cast, and muted colors with preview and AI Restore.',
+    images: ['/og-image.png']
+  }
 };
 
 // steps 解释从上传到 AI 修复的最短使用路径。

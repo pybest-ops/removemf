@@ -45,14 +45,14 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
   return (
     <div className="mt-7">
       <button
-        className="inline-flex rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+        className="inline-flex w-full justify-center rounded-full bg-gradient-to-r from-matcha-300 via-emerald-300 to-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-400/20 transition hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
         disabled={isLoading || status === 'loading'}
         onClick={handleBuy}
         type="button"
       >
         {isLoading ? 'Opening PayPal...' : user ? 'Buy credits' : 'Sign in to buy'}
       </button>
-      {errorMessage ? <p className="mt-3 text-sm text-red-600">{errorMessage}</p> : null}
+      {errorMessage ? <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{errorMessage}</p> : null}
     </div>
   );
 }

@@ -22,3 +22,38 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/* glow-drift 为首页背景光斑提供缓慢漂移动效。 */
+@keyframes glow-drift {
+  0%, 100% {
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-46%, 2rem, 0) scale(1.08);
+  }
+}
+
+/* float-soft 为首屏玻璃信息卡提供轻微悬浮动效。 */
+@keyframes float-soft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.65rem);
+  }
+}
+
+.animate-glow-drift {
+  animation: glow-drift 12s ease-in-out infinite;
+}
+
+.animate-float-soft {
+  animation: float-soft 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-glow-drift,
+  .animate-float-soft {
+    animation: none;
+  }
+}

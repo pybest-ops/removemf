@@ -239,91 +239,95 @@ export function UploadPageFlow() {
   }
 
   return (
-    <div id="upload" className="overflow-hidden rounded-[1.75rem] bg-white shadow-sm ring-1 ring-matcha-100">
-      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
+    <div id="upload" className="overflow-hidden rounded-[2.5rem] border border-white/70 bg-white/65 shadow-[0_30px_100px_rgba(31,82,44,0.16)] ring-1 ring-matcha-100/50 backdrop-blur-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/70 bg-white/45 px-5 py-4 md:px-7">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">Free browser preview</p>
-          <h2 className="mt-1 text-xl font-semibold text-slate-950">Upload your photo</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">Free preview</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-slate-950">Upload your photo</h2>
         </div>
-        <span className="rounded-full bg-matcha-50 px-3 py-1 text-xs font-semibold text-matcha-800">No subscription</span>
+        <span className="rounded-full border border-matcha-200 bg-white/75 px-4 py-2 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur">No subscription</span>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 md:p-6">
         {noticeMessage ? (
-          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+          <div className="mb-4 rounded-3xl border border-amber-200 bg-amber-50/85 px-4 py-3 text-sm font-semibold text-amber-800 shadow-sm backdrop-blur">
             {noticeMessage}
           </div>
         ) : null}
 
-        <label className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-matcha-200 bg-matcha-50/60 px-4 text-center transition hover:border-matcha-400 hover:bg-matcha-50" onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
+        <div className={file ? 'grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_24rem]' : ''}>
+        <label className="group flex min-h-[22rem] cursor-pointer flex-col items-center justify-center rounded-[2rem] border border-dashed border-matcha-300/80 bg-gradient-to-br from-white/85 via-matcha-50/80 to-white/60 px-5 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_18px_55px_rgba(31,82,44,0.10)] transition duration-300 hover:-translate-y-1 hover:border-matcha-500 hover:shadow-[0_24px_75px_rgba(31,82,44,0.16)]" onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
           <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={handleFileChange} />
           {localPreviewUrl ? (
-            <div className="space-y-3">
-              <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-                <img className="max-h-40 w-full rounded-xl bg-slate-100 object-contain" src={localPreviewUrl} alt="Selected upload preview" />
+            <div className="w-full space-y-4">
+              <div className="rounded-[1.6rem] border border-white/80 bg-white/80 p-3 shadow-[0_20px_60px_rgba(31,82,44,0.14)] backdrop-blur">
+                <img className="max-h-[28rem] w-full rounded-[1.25rem] bg-slate-100 object-contain" src={localPreviewUrl} alt="Selected upload preview" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-900">Preview ready</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-matcha-700">Preview ready</p>
                 <p className="text-sm font-medium text-slate-700">{file?.name ?? 'Selected image'}</p>
                 <p className="text-xs leading-5 text-slate-500">Drop another JPG, PNG, or WEBP to replace it.</p>
               </div>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="max-w-md space-y-4">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-2xl shadow-[0_18px_45px_rgba(31,82,44,0.12)] transition duration-300 group-hover:-translate-y-1">
+                ↑
+              </div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Step 1 · Upload</p>
-              <span className="block text-sm font-medium text-slate-700">Choose or drop a JPG, PNG, or WEBP image under 10MB.</span>
-              <p className="text-xs leading-5 text-slate-500">Works best on photos with a visible green or yellow tint, especially skin, food, and white backgrounds.</p>
+              <span className="block text-2xl font-semibold tracking-[-0.03em] text-slate-950">Choose or drop your photo</span>
+              <p className="text-sm leading-6 text-slate-500">Use a JPG, PNG, or WEBP image under 10MB. Works best on visible green or yellow tint, especially skin, food, and white backgrounds.</p>
             </div>
           )}
         </label>
 
         {file ? (
-          <>
-            <section className="mt-4 rounded-2xl bg-slate-50 p-4">
+          <div className="space-y-5">
+            <section className="rounded-[2rem] border border-white/80 bg-white/75 p-4 shadow-[0_18px_55px_rgba(31,82,44,0.10)] backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-matcha-700">Free result</p>
-                  <h3 className="mt-1 text-lg font-semibold text-slate-950">Try a quick color cleanup</h3>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-matcha-700">Free preview</p>
+                  <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-slate-950">Preview basic color cleanup</h3>
                 </div>
                 <button
-                  className="rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800 disabled:cursor-not-allowed disabled:bg-slate-300"
                   disabled={isFreeProcessing}
                   onClick={applyFreeCleanup}
                   type="button"
                 >
-                  {isFreeProcessing ? 'Processing...' : freeResultUrl ? 'Refresh free cleanup' : 'Apply free cleanup'}
+                  {isFreeProcessing ? 'Processing...' : freeResultUrl ? 'Refresh preview' : 'Run free preview'}
                 </button>
               </div>
 
               {freeResultUrl ? (
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <figure>
-                    <img className="max-h-72 w-full rounded-xl bg-white object-contain" src={localPreviewUrl ?? undefined} alt="Original photo" />
+                    <img className="max-h-72 w-full rounded-2xl bg-white object-contain shadow-inner" src={localPreviewUrl ?? undefined} alt="Original photo" />
                     <figcaption className="mt-2 text-xs font-medium text-slate-500">Original</figcaption>
                   </figure>
                   <figure>
-                    <img className="max-h-72 w-full rounded-xl bg-white object-contain" src={freeResultUrl ?? undefined} alt="Basic cleanup result" />
-                    <figcaption className="mt-2 text-xs font-medium text-slate-500">Basic cleanup</figcaption>
+                    <img className="max-h-72 w-full rounded-2xl bg-white object-contain shadow-inner" src={freeResultUrl ?? undefined} alt="Free preview result" />
+                    <figcaption className="mt-2 text-xs font-medium text-slate-500">Free preview</figcaption>
                   </figure>
-                  <a className="inline-flex justify-center rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white md:col-span-2" download="matcha-free-cleanup.png" href={freeResultUrl}>
-                    Download free result
+                  <a className="inline-flex justify-center rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,105,51,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800 md:col-span-2" download="matcha-free-cleanup.png" href={freeResultUrl}>
+                    Download free preview
                   </a>
                 </div>
               ) : (
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  Run the free cleanup to see whether the cast is light enough to stop here or whether AI Restore is worth 1 credit.
+                  Run the free preview to see whether the cast is light enough to stop here or whether AI Restore is worth 1 credit.
                 </p>
               )}
             </section>
 
-            <section className="relative mt-4 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-4 text-white shadow-lg shadow-slate-950/20">
+            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 text-white shadow-[0_24px_75px_rgba(15,23,42,0.28)]">
               <div className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-matcha-400/20 blur-3xl" />
               <div className="pointer-events-none absolute -bottom-12 -left-8 h-28 w-28 rounded-full bg-cyan-400/15 blur-3xl" />
 
               <div className="relative flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-matcha-200">AI Restore</p>
-                  <h3 className="mt-1 text-lg font-semibold text-white">Need a stronger result?</h3>
+                  <h3 className="mt-1 text-xl font-semibold tracking-[-0.03em] text-white">Still looks too green?</h3>
                 </div>
                 <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white shadow-sm shadow-black/10 backdrop-blur">
                   1 credit
@@ -331,10 +335,10 @@ export function UploadPageFlow() {
               </div>
 
               <p className="relative mt-3 text-sm leading-6 text-slate-300">
-                Use AI Restore when the free cleanup still leaves a strong cast or when you want a more natural-looking finish.
+                Use AI Restore when the free preview still leaves a strong cast or when you want a more natural-looking finish.
               </p>
 
-              <div className="relative mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_15rem]">
+              <div className="relative mt-5 grid gap-5">
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm font-medium text-white">Restore strength</p>
@@ -342,7 +346,7 @@ export function UploadPageFlow() {
                       {(['light', 'natural', 'strong'] as RestoreMode[]).map((mode) => (
                         <button
                           key={mode}
-                          className={`rounded-full border px-3 py-2 text-sm font-medium transition ${restoreMode === mode ? 'border-matcha-300 bg-matcha-300 text-slate-950 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/10 bg-white/5 text-slate-200 hover:border-white/20 hover:bg-white/10'}`}
+                          className={`rounded-full border px-3 py-2 text-sm font-medium transition ${restoreMode === mode ? 'border-matcha-300 bg-matcha-300 text-slate-950 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/10 bg-white/5 text-slate-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10'}`}
                           onClick={() => setRestoreMode(mode)}
                           type="button"
                         >
@@ -358,7 +362,7 @@ export function UploadPageFlow() {
                       {(['soft', 'standard', 'strong'] as WhiteBalanceMode[]).map((mode) => (
                         <button
                           key={mode}
-                          className={`rounded-full border px-3 py-2 text-sm font-medium transition ${whiteBalanceMode === mode ? 'border-cyan-200 bg-cyan-200 text-slate-950 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/10 bg-white/5 text-slate-200 hover:border-white/20 hover:bg-white/10'}`}
+                          className={`rounded-full border px-3 py-2 text-sm font-medium transition ${whiteBalanceMode === mode ? 'border-cyan-200 bg-cyan-200 text-slate-950 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/10 bg-white/5 text-slate-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10'}`}
                           onClick={() => setWhiteBalanceMode(mode)}
                           type="button"
                         >
@@ -370,70 +374,71 @@ export function UploadPageFlow() {
 
                   <label className="flex items-center gap-3 text-sm font-medium text-white">
                     <input checked={skinTonePriority} onChange={(event) => setSkinTonePriority(event.target.checked)} type="checkbox" />
-                    Natural skin tone priority
+                    Prioritize natural skin tones
                   </label>
                 </div>
 
                 <div className="flex flex-col gap-3">
                   <button
-                    className="rounded-full bg-gradient-to-r from-matcha-400 via-emerald-400 to-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-400/20 transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
+                    className="rounded-full bg-gradient-to-r from-matcha-300 via-emerald-300 to-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-400/20 transition hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
                     disabled={!canSubmit}
                     onClick={handleSubmit}
                     type="button"
                   >
                     {isSubmitting ? 'Creating job...' : user ? 'Restore with AI' : 'Sign in to restore'}
                   </button>
-                  <Link className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/10" href="/pricing">
+                  <Link className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10" href="/pricing">
                     View credits
                   </Link>
                 </div>
               </div>
 
               {job?.status === 'completed' && job.outputPreviewUrl ? (
-                <div className="relative mt-5 rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur">
+                <div className="relative mt-5 rounded-[1.5rem] border border-white/10 bg-white/10 p-4 backdrop-blur">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-200">AI result ready</p>
-                      <h4 className="mt-1 text-base font-semibold text-white">Compare the original and restored image</h4>
+                      <h4 className="mt-1 text-base font-semibold tracking-[-0.02em] text-white">Compare the original and restored image</h4>
                     </div>
-                    <Link className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15" href={`/result/${job.jobId}`}>
+                    <Link className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/15" href={`/result/${job.jobId}`}>
                       Open full result
                     </Link>
                   </div>
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
                     <figure>
-                      <img className="max-h-72 w-full rounded-xl bg-slate-950 object-contain" src={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} alt="Original before AI restore" />
+                      <img className="max-h-72 w-full rounded-2xl bg-slate-950 object-contain shadow-inner" src={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} alt="Original before AI restore" />
                       <figcaption className="mt-2 text-xs font-medium text-slate-300">Before</figcaption>
                     </figure>
                     <figure>
-                      <img className="max-h-72 w-full rounded-xl bg-slate-950 object-contain" src={job.outputPreviewUrl} alt="AI restored result" />
+                      <img className="max-h-72 w-full rounded-2xl bg-slate-950 object-contain shadow-inner" src={job.outputPreviewUrl} alt="AI restored result" />
                       <figcaption className="mt-2 text-xs font-medium text-slate-300">After · AI restored</figcaption>
                     </figure>
                   </div>
                 </div>
               ) : null}
             </section>
-          </>
+          </div>
         ) : null}
+        </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <InfoCard title="Free vs AI" text="Free cleanup is a quick browser preview; AI Restore gives the stronger paid pass." />
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <InfoCard title="Free preview vs AI Restore" text="Free preview is a quick browser pass; AI Restore gives the stronger paid pass." />
           <InfoCard title="Best input" text="Use photos with visible green or yellow tint. Very dark, blurry, or heavily compressed files work less well." />
-          <InfoCard title="Credit model" text="There is no subscription. 1 credit creates 1 AI restoration job." />
+          <InfoCard title="Credit model" text="There is no subscription. 1 credit creates 1 AI Restore." />
         </div>
 
         <canvas className="hidden" ref={canvasRef} />
       </div>
 
-      <div className="border-t border-slate-100 px-5 py-4 text-sm text-slate-600">
-        {errorMessage ? <p className="text-red-600">{errorMessage === 'INSUFFICIENT_CREDITS' ? 'You need credits before restoring this image.' : errorMessage}</p> : null}
-        {!errorMessage ? <p>{job ? `Status: ${job.status} (${job.progress}%)` : 'Free cleanup stays in your browser. AI Restore uploads the selected image for processing.'}</p> : null}
+      <div className="border-t border-white/70 bg-white/45 px-5 py-4 text-sm text-slate-600 md:px-7">
+        {errorMessage ? <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-semibold text-red-700">{errorMessage === 'INSUFFICIENT_CREDITS' ? 'You need credits before restoring this image.' : errorMessage}</p> : null}
+        {!errorMessage ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">{job ? `Status: ${job.status} (${job.progress}%)` : 'Free preview stays in your browser. AI Restore uploads the selected image for processing.'}</p> : null}
         {job?.restoreMode || job?.whiteBalanceMode || job?.skinTonePriority ? (
-          <p className="mt-1 text-slate-500">
+          <p className="mt-2 px-4 text-slate-500">
             {[job.restoreMode === 'light' ? 'Light restore' : job.restoreMode === 'strong' ? 'Strong restore' : 'Natural restore', job.whiteBalanceMode === 'soft' ? 'Soft white balance' : job.whiteBalanceMode === 'strong' ? 'Strong white balance' : 'Standard white balance', job.skinTonePriority ? 'Skin tone priority' : null].filter(Boolean).join(' · ')}
           </p>
         ) : null}
-        {isPolling ? <p className="mt-1 text-matcha-700">Checking result...</p> : null}
+        {isPolling ? <p className="mt-2 px-4 font-semibold text-matcha-700">Checking result...</p> : null}
       </div>
     </div>
   );
@@ -462,7 +467,7 @@ function clampChannel(value: number) {
 
 function InfoCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="rounded-3xl border border-white/80 bg-white/70 p-4 shadow-[0_18px_50px_rgba(31,82,44,0.10)] backdrop-blur transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(31,82,44,0.16)]">
       <p className="text-sm font-semibold text-slate-950">{title}</p>
       <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
     </div>

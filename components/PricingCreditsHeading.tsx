@@ -8,8 +8,8 @@ export function PricingCreditsHeading() {
   const hasPurchasedCredits = recentOrders.some((order) => order.status === 'paid');
 
   if (status === 'loading' || !user || !hasPurchasedCredits) {
-    return <h1 className="mt-3 text-4xl font-semibold text-slate-950">Buy credits only when you need them.</h1>;
+    return <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.04] tracking-[-0.05em] text-slate-950 md:text-6xl">Buy credits only when you need AI Restore.</h1>;
   }
 
-  return <h1 className="mt-3 text-4xl font-semibold text-slate-950">You have {creditsBalance} credits remaining.</h1>;
+  return <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.04] tracking-[-0.05em] text-slate-950 md:text-6xl">You have {creditsBalance} credits remaining.</h1>;
 }
