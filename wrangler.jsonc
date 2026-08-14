@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "matcha-filter-remover",
+  "name": "removemf",
   "main": ".open-next/worker.js",
   "workers_dev": true,
   "preview_urls": true,

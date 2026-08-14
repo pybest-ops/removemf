@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import matchaExample from '@/app/assets/matcha-example.avif';
-import normalExample from '@/app/assets/normal-example.avif';
+import matchaExample from '@/app/assets/matcha-example.png';
+import normalExample from '@/app/assets/normal-example.png';
 
 // BeforeAfterSlider 用本地示例图展示滤镜移除前后的可拖动对比。
 export function BeforeAfterSlider() {

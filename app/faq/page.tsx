@@ -9,6 +9,14 @@ const faqItems = [
     answer: 'No. The AI can improve color balance, but it cannot guarantee recreating the untouched source file or pixel-pixel-level reconstruction.'
   },
   {
+    question: 'Can a filter be removed from a saved photo?',
+    answer: 'A saved filtered photo can be corrected, but it cannot be perfectly reversed. The goal is to reduce the green tint, yellow cast, or matcha-style color cast and make the image look more natural.'
+  },
+  {
+    question: 'Is this the same as restoring the original file?',
+    answer: 'No. The original pixels are not available after a filter has been baked into a saved image. AI Restore creates a more balanced version instead of proving what the exact original looked like.'
+  },
+  {
     question: 'What image formats are supported?',
     answer: 'The MVP upload flow supports JPG, PNG, and WEBP images under the configured size limit.'
   },
@@ -17,8 +25,12 @@ const faqItems = [
     answer: 'Uploaded images may be stored temporarily and processed by an AI provider so the service can create previews and downloadable results.'
   },
   {
+    question: 'Is it safe to upload personal photos?',
+    answer: 'Only upload photos you own or have permission to edit. Uploaded images may be processed by an AI provider, so avoid sensitive content you do not want handled by the service.'
+  },
+  {
     question: 'How do credits work?',
-    answer: 'There is no subscription and no free generation. Buy credits only when you need them; 1 credit creates 1 matcha filter removal, and credits are valid for 12 months.'
+    answer: 'There is no subscription. Browser cleanup preview is free, and AI Restore uses 1 credit for each stronger matcha filter removal. Credits are valid for 12 months.'
   },
   {
     question: 'What if the result is not good enough?',

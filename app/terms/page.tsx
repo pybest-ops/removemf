@@ -14,7 +14,7 @@ const termsSections = [
   },
   {
     title: '4. Credits and paid use',
-    body: 'The service sells prepaid credit packs through PayPal Checkout. There is no subscription, no free image generation, and 1 credit creates 1 matcha filter removal. Purchased credits are valid for 12 months from purchase.'
+    body: 'The service sells prepaid credit packs through PayPal Checkout. There is no subscription. Browser cleanup preview is free, and 1 credit creates 1 AI Restore matcha filter removal. Purchased credits are valid for 12 months from purchase.'
   },
   {
     title: '5. Storage and downloads',

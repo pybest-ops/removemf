@@ -20,7 +20,7 @@ const faqs = [
   },
   {
     question: 'How do credits work?',
-    answer: 'There is no subscription and no free generation. Buy credits when you need them; 1 credit creates 1 matcha filter removal.'
+    answer: 'There is no subscription. Browser cleanup preview is free, and AI Restore uses 1 credit for each stronger matcha filter removal.'
   }
 ];
 
@@ -59,7 +59,7 @@ function HeroSection() {
         <p className="mt-5 text-sm text-slate-500">JPG, PNG, WEBP · Single-photo recovery · Natural output, not original reconstruction</p>
       </div>
 
-      <div className="overflow-hidden rounded-[1.75rem] shadow-sm ring-1 ring-black/5">
+      <div className="self-start overflow-hidden rounded-[1.75rem] shadow-sm ring-1 ring-black/5">
         <BeforeAfterSlider />
       </div>
     </section>
@@ -142,13 +142,20 @@ function Feature({ title, text }: { title: string; text: string }) {
 // Footer 提供上线前必须保留的合规入口。
 function Footer() {
   return (
-    <footer className="flex flex-col gap-4 border-t border-slate-200 py-8 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-      <p>Remove Matcha Filter · AI natural photo recovery</p>
-      <nav className="flex gap-5">
-        <Link href="/privacy">Privacy</Link>
-        <Link href="/terms">Terms</Link>
-        <Link href="/refund">Refund</Link>
-      </nav>
+    <footer className="flex flex-col gap-4 border-t border-slate-200 py-8 text-sm text-slate-500">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <p>Remove Matcha Filter · AI natural photo recovery</p>
+        <nav className="flex gap-5">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/refund">Refund</Link>
+        </nav>
+      </div>
+      <div className="flex justify-center">
+        <a href="https://submito.net" target="_blank" rel="noopener noreferrer" title="Listed on Submito">
+          <img src="https://submito.net/badge/listed-light.svg" alt="Listed on Submito" />
+        </a>
+      </div>
     </footer>
   );
 }

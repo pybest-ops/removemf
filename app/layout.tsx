@@ -8,8 +8,8 @@ import favicon from './assets/favicon.ico';
 import logo from './assets/logo.png';
 
 export const metadata: Metadata = {
-  title: 'Remove Matcha Filter',
-  description: 'Upload a photo and let AI restore a more natural look in seconds.',
+  title: 'Remove Matcha Filter from Photos Online',
+  description: 'Remove matcha filter, green tint, yellow cast, or color cast from a photo online with free browser preview and AI Restore.',
   icons: {
     icon: favicon.src
   }

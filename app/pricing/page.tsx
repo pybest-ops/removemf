@@ -13,7 +13,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { token?:
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Credits</p>
         <PricingCreditsHeading />
         <p className="mt-4 max-w-3xl leading-7 text-slate-600">
-          No subscription and no free generation. Each credit creates one matcha filter removal, and unused credits stay in your account for 12 months.
+          No subscription. Browser cleanup preview is free, and each credit creates one AI Restore matcha filter removal. Unused credits stay in your account for 12 months.
         </p>
         {searchParams?.checkout === 'cancelled' ? <p className="mt-4 text-sm font-semibold text-amber-700">Checkout was cancelled. No credits were added.</p> : null}
       </section>

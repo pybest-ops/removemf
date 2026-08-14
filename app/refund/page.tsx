@@ -2,7 +2,7 @@
 const refundSections = [
   {
     title: '1. Paid credit packs',
-    body: 'Remove Matcha Filter sells prepaid credit packs through PayPal Checkout. There is no subscription and no free image generation in the production payment flow.'
+    body: 'Remove Matcha Filter sells prepaid credit packs through PayPal Checkout. There is no subscription. Browser cleanup preview is free, and AI Restore uses paid credits.'
   },
   {
     title: '2. Unused credits',
