@@ -1,0 +1,62 @@
+seo/网站描述160字.md
+  s_0cc9da9369b544::t_99fb0cbb77d9fe 1
+app/privacy/page.tsx
+  s_4f73386410ae1a::t_44c8cd9a68d61b 1-31,35,39,42-43,46-47,51,55,59-66,69-150
+components/BuyCreditsButton.tsx
+  s_4f73386410ae1a::t_902b5ed9a76020 48,55
+app/upload/page.tsx
+  s_4f73386410ae1a::t_50face210cdbe7 59-60,65-67,70
+  s_4f73386410ae1a::t_e8dc526e8460ab 36-50
+  s_4f73386410ae1a::t_f55ebae4da9ccf 55
+  s_4f73386410ae1a::t_1bfaf5a85f24f7 13-15,18-19,23-26,28-33,35,57,61-62,64,71-79,87,90
+  s_4f73386410ae1a::t_ef5b3d72b46421 16-17,20,58,63,68,80
+app/layout.tsx
+  s_4f73386410ae1a::t_dc00037e492062 27
+app/page.tsx
+  s_4f73386410ae1a::t_dd7a978084f61b 36-44,49-57,64-88,91-92,96-100,106-117,122,125-132,135,138,140,143,147-154,157-168,177-179,182-183,188-190,201-206,210-212,224,227-235,255
+app/pricing/page.tsx
+  s_4f73386410ae1a::t_e16439ff7344dd 15-51,56-145
+components/PricingCreditsHeading.tsx
+  s_4f73386410ae1a::t_902b5ed9a76020 11,14
+components/CaptureCheckout.tsx
+  s_4f73386410ae1a::t_902b5ed9a76020 45
+app/terms/page.tsx
+  s_4f73386410ae1a::t_d838c669f39aa9 1-31,43,47,51,59,63-70,73-154
+app/faq/page.tsx
+  s_4f73386410ae1a::t_07f56f52bf2bd6 2-16,18-39,42-63,66-87,94-148,152-202
+app/refund/page.tsx
+  s_4f73386410ae1a::t_07ffd52c9da947 1-31,35,39,43,47,51,55,59-66,69-150
+components/UploadPageFlow.tsx
+  s_4f73386410ae1a::t_7df9ec35b269ab 309
+  s_4f73386410ae1a::t_931e9a51a7a040 397,401,403,409,413,420,422,424,433-434,437,441,470
+  s_4f73386410ae1a::t_ef5b3d72b46421 245-246,248,251,253,258-259,262-264,267,273-276,278-279,285-286,289-290,293,298,310,312-313,318,323,330,338,341,349,365,377,425,427,435
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "179a7addf97104543363d7a425770a1f98cfd851",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_0cc9da9369b544": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0004f-8492-7d02-b1cd-a5b8584e8611",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    },
+    "s_4f73386410ae1a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0006d-3185-7551-94e7-69f95886c078",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
