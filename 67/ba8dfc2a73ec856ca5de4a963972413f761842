@@ -1,0 +1,14 @@
+components/UploadPageFlow.tsx
+  ai_agent 473-479,488,495-502
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "67ba8dfc2a73ec856ca5de4a963972413f761842",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
