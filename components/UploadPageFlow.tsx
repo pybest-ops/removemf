@@ -470,7 +470,13 @@ function AiProgressPanel({ isPolling, isSubmitting, job, progress, restoreSummar
       </div>
       <div className="relative mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
         <span>{job?.status ? `Status: ${job.status}` : 'Creating upload and job records'}</span>
-        <span>{isPolling ? 'Checking result automatically' : job?.status === 'completed' ? 'Preview is ready below' : 'Waiting for next step'}</span>
+        {job?.status === 'completed' && job.outputPreviewUrl ? (
+          <a className="rounded-full bg-gradient-to-r from-matcha-300 via-emerald-300 to-cyan-300 px-4 py-2 font-semibold text-slate-950 shadow-[0_14px_35px_rgba(103,232,249,0.22)] transition hover:-translate-y-0.5 hover:brightness-105" href="#ai-result-studio">
+            View AI Result Studio ↓
+          </a>
+        ) : (
+          <span>{isPolling ? 'Checking result automatically' : 'Waiting for next step'}</span>
+        )}
       </div>
     </div>
   );
@@ -479,16 +485,21 @@ function AiProgressPanel({ isPolling, isSubmitting, job, progress, restoreSummar
 // AiResultStudio 在上传页直接展示完整 AI 结果，不强制用户跳转到结果页。
 function AiResultStudio({ job, originalUrl }: { job: Job; originalUrl?: string }) {
   return (
-    <section className="mt-5 overflow-hidden rounded-[2rem] border border-white/70 bg-white/75 p-5 shadow-[0_24px_80px_rgba(31,82,44,0.14)] backdrop-blur-xl md:p-6">
+    <section className="mt-5 scroll-mt-8 overflow-hidden rounded-[2rem] border border-white/70 bg-white/75 p-5 shadow-[0_24px_80px_rgba(31,82,44,0.14)] backdrop-blur-xl md:p-6" id="ai-result-studio">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">AI Result Studio</p>
           <h3 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">Your restored image is ready here.</h3>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Review the AI Restore output directly on this page. Natural result, not exact original.</p>
         </div>
-        <a className="inline-flex justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href={job.outputPreviewUrl} rel="noreferrer" target="_blank">
-          Open image in new tab
-        </a>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <a className="inline-flex justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href={job.outputPreviewUrl} rel="noreferrer" target="_blank">
+            Open image in new tab
+          </a>
+          <a className="inline-flex justify-center rounded-full bg-gradient-to-r from-matcha-500 via-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(34,197,94,0.22)] transition hover:-translate-y-0.5 hover:brightness-105" download="matcha-ai-restore.png" href={job.outputPreviewUrl}>
+            Download image
+          </a>
+        </div>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[0.82fr_1.18fr]">
