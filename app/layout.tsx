@@ -1,5 +1,7 @@
 import './globals.css';
 import { AuthButton } from '@/components/AuthButton';
+import { FeedbackWidget } from '@/components/FeedbackWidget';
+import { MobileMenu } from '@/components/MobileMenu';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -25,6 +27,8 @@ export const metadata: Metadata = {
 const navItems = [
   { href: '/upload', label: 'Upload' },
   { href: '/pricing', label: 'Pricing' },
+  { href: '/my-images', label: 'My Images' },
+  { href: '/blog', label: 'Blog' },
   { href: '/faq', label: 'FAQ' }
 ];
 
@@ -41,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 })(window, document, "clarity", "script", "y1rc6msx2v");`}</Script>
         <SiteHeader />
         {children}
+        <FeedbackWidget />
       </body>
     </html>
   );
@@ -49,11 +54,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 // SiteHeader 提供全站品牌识别、主要页面导航和上传转化入口。
 function SiteHeader() {
   return (
-    <header className="sticky top-0 z-30 border-b border-matcha-100/80 bg-[#f7faf7]/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-5 px-6 py-4">
+    <header className="sticky top-0 z-50 border-b border-matcha-100/80 bg-[#f7faf7]/90 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-5 px-6 py-2 md:py-4">
         <Link className="flex items-center gap-3" href="/">
           <Image alt="Remove Matcha Filter logo" className="h-10 w-10 rounded-2xl object-cover" height={40} src={logo} width={40} />
-          <span>
+          <span className="hidden sm:block">
             <span className="block text-sm font-semibold leading-5 text-slate-950">Remove Matcha Filter</span>
             <span className="hidden text-xs text-slate-500 sm:block">AI natural photo recovery</span>
           </span>
@@ -69,6 +74,7 @@ function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <AuthButton />
+          <MobileMenu items={navItems} />
         </div>
       </div>
     </header>

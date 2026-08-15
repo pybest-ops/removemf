@@ -4,7 +4,7 @@ import type { MetadataRoute } from 'next';
 const siteUrl = 'https://removematchafilter.org';
 
 // sitemapRoutes 定义允许搜索引擎收录的公开静态页面。
-const sitemapRoutes = ['/', '/pricing', '/faq', '/privacy', '/terms', '/refund', '/upload', '/what-is-matcha-filter', '/how-to-remove-matcha-filter'];
+const sitemapRoutes = ['/', '/pricing', '/faq', '/privacy', '/terms', '/refund', '/upload', '/blog', '/what-is-matcha-filter', '/how-to-remove-matcha-filter'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return sitemapRoutes.map((route) => ({

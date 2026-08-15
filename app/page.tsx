@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 // heroPills 强化首屏对格式、免费预览和付费 AI Restore 的即时理解。
-const heroPills = ['JPG / PNG / WEBP', 'Free browser preview', 'AI Restore uses 1 credit'];
+const heroPills = ['JPG / PNG / WEBP', 'Process free in browser', 'AI Restore uses 1 credit'];
 
 // proofMetrics 用短数据卡提升工具可信度和首页视觉层级。
 const proofMetrics = [
@@ -155,10 +155,6 @@ function HeroSection() {
       </div>
 
       <div className="relative mt-10 lg:mt-0">
-        <div className="absolute -left-6 top-9 hidden w-48 rounded-3xl border border-white/80 bg-white/70 p-4 shadow-[0_20px_60px_rgba(31,82,44,0.16)] backdrop-blur-xl lg:block animate-float-soft">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-matcha-700">Browser preview</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Try color cleanup before spending a credit.</p>
-        </div>
         <div className="absolute -right-4 bottom-7 z-10 hidden w-52 rounded-3xl border border-matcha-100 bg-slate-950/90 p-4 text-white shadow-[0_25px_70px_rgba(15,23,42,0.32)] backdrop-blur-xl md:block">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-matcha-200">AI Restore</p>
           <p className="mt-2 text-sm leading-6 text-slate-200">Stronger tint reduction when the photo still looks too green.</p>

@@ -1,4 +1,4 @@
-import { createR2DownloadUrl, isR2Configured, putR2Object } from './r2';
+import { createR2DownloadUrl, deleteR2Object, isR2Configured, putR2Object } from './r2';
 import { getUploadedAsset } from './uploadsStore';
 
 // getPublicInputUrl 当前优先返回 R2 短期签名 URL；无 R2 时回退到本地上传 data URI。
@@ -44,4 +44,15 @@ export async function persistRemoteImageToR2(remoteUrl: string, jobId: string) {
     objectKey,
     publicUrl: publicUrl ?? remoteUrl
   };
+}
+
+// deleteStoredResultImage 尽量删除已生成结果图；本地 fallback 或删除失败不阻断历史记录移除。
+export async function deleteStoredResultImage(outputObjectKey?: string) {
+  if (!outputObjectKey || !isR2Configured()) return;
+
+  try {
+    await deleteR2Object(outputObjectKey);
+  } catch {
+    // 删除对象失败时保留软删除结果，避免用户界面继续显示已移除图片。
+  }
 }

@@ -17,8 +17,8 @@ export function BeforeAfterSlider() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-white/10" />
       <div className="absolute inset-y-0 w-0.5 bg-white shadow-[0_0_24px_rgba(255,255,255,0.9)]" style={{ left: `${sliderValue}%` }} />
-      <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-slate-950/70 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur">Matcha filter</div>
-      <div className="absolute right-4 top-4 rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs font-semibold text-slate-900 shadow-lg backdrop-blur">Restored</div>
+      <div className="absolute left-3 top-3 rounded-full border border-white/20 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg backdrop-blur sm:left-4 sm:top-4 sm:px-3 sm:text-xs">Matcha filter</div>
+      <div className="absolute right-3 top-3 rounded-full border border-white/70 bg-white/85 px-2.5 py-1 text-[10px] font-semibold text-slate-900 shadow-lg backdrop-blur sm:right-4 sm:top-4 sm:px-3 sm:text-xs">Restored</div>
       <label className="sr-only" htmlFor="hero-before-after-slider">Compare matcha filter and restored photo</label>
       <input
         id="hero-before-after-slider"
@@ -30,12 +30,12 @@ export function BeforeAfterSlider() {
         type="range"
         value={sliderValue}
       />
-      <div className="pointer-events-none absolute top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-sm font-semibold text-slate-900 shadow-[0_18px_45px_rgba(15,23,42,0.25)] backdrop-blur" style={{ left: `${sliderValue}%` }}>
+      <div className="pointer-events-none absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-xs font-semibold text-slate-900 shadow-[0_18px_45px_rgba(15,23,42,0.25)] backdrop-blur sm:h-12 sm:w-12 sm:text-sm" style={{ left: `${sliderValue}%` }}>
         ↔
       </div>
-      <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl border border-white/20 bg-slate-950/55 px-4 py-3 text-xs font-medium text-white shadow-lg backdrop-blur">
+      <div className="pointer-events-none absolute bottom-3 left-3 right-3 flex items-center justify-center rounded-2xl border border-white/20 bg-slate-950/55 px-3 py-2 text-[10px] font-medium text-white shadow-lg backdrop-blur sm:bottom-4 sm:left-4 sm:right-4 sm:justify-between sm:px-4 sm:py-3 sm:text-xs">
         <span>Drag to compare</span>
-        <span className="text-matcha-100">Natural color recovery</span>
+        <span className="hidden text-matcha-100 sm:inline">Natural color recovery</span>
       </div>
     </div>
   );

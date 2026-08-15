@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
+import { getAuthenticatedUser } from '@/lib/authUser';
 import { refundJobCreditsAsync } from '@/lib/billingStore';
-import { getStoredJobAsync, normalizeReplicateStatus, updateStoredJobAsync } from '@/lib/jobsStore';
+import { getStoredJobAsync, markJobDeletedAsync, normalizeReplicateStatus, updateStoredJobAsync } from '@/lib/jobsStore';
 import { getReplicateOutputUrl, getReplicatePrediction } from '@/lib/replicate';
-import { persistRemoteImageToR2 } from '@/lib/storage';
+import { deleteStoredResultImage, persistRemoteImageToR2 } from '@/lib/storage';
 import { getRestoreSettingsSummary } from '@/lib/restoreSettings';
 
 // GET 查询图片恢复任务状态；有 Replicate prediction 时同步刷新状态。
@@ -60,4 +61,23 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   }
 
   return NextResponse.json({ ...job, restoreSummary });
+}
+
+// DELETE 软删除当前登录用户自己的 AI Restore 历史结果。
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const user = await getAuthenticatedUser(request);
+
+  if (!user) {
+    return NextResponse.json({ errorCode: 'UNAUTHORIZED', errorMessage: 'Please sign in to delete this image.' }, { status: 401 });
+  }
+
+  const deletedJob = await markJobDeletedAsync(params.id, user.id);
+
+  if (!deletedJob) {
+    return NextResponse.json({ errorCode: 'JOB_NOT_FOUND' }, { status: 404 });
+  }
+
+  await deleteStoredResultImage(deletedJob.outputObjectKey);
+
+  return NextResponse.json({ ok: true });
 }

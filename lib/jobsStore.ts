@@ -10,6 +10,7 @@ type StoredJob = Job & {
   restoreSettingsJson?: string;
   replicatePredictionId?: string;
   creditsRefunded?: boolean;
+  deletedAt?: string;
 };
 
 type JobsStoreGlobal = typeof globalThis & {
@@ -32,6 +33,7 @@ type JobRow = {
   output_preview_url?: string;
   replicate_prediction_id?: string;
   credits_refunded: number;
+  deleted_at?: string;
   created_at: string;
   updated_at: string;
 };
@@ -106,7 +108,7 @@ export async function getStoredJobAsync(jobId: string) {
 
   const row = await db
     .prepare(
-      `SELECT id, user_id, input_object_key, output_object_key, restore_settings_json, status, model_name, cost_credits, progress, error_code, error_message, input_preview_url, output_preview_url, replicate_prediction_id, credits_refunded, created_at, updated_at
+      `SELECT id, user_id, input_object_key, output_object_key, restore_settings_json, status, model_name, cost_credits, progress, error_code, error_message, input_preview_url, output_preview_url, replicate_prediction_id, credits_refunded, deleted_at, created_at, updated_at
        FROM jobs
        WHERE id = ?
        LIMIT 1`
@@ -150,7 +152,8 @@ export async function updateStoredJobAsync(jobId: string, patch: Partial<StoredJ
     outputObjectKey: 'output_object_key',
     restoreSettingsJson: 'restore_settings_json',
     replicatePredictionId: 'replicate_prediction_id',
-    creditsRefunded: 'credits_refunded'
+    creditsRefunded: 'credits_refunded',
+    deletedAt: 'deleted_at'
   };
   const entries = Object.entries(patch).filter(([key]) => fieldMap[key as keyof StoredJob]);
 
@@ -166,6 +169,42 @@ export async function updateStoredJobAsync(jobId: string, patch: Partial<StoredJ
     .run();
 
   return getStoredJobAsync(jobId);
+}
+
+// listCompletedJobsByUserAsync 返回当前用户未删除的 AI Restore 完成结果。
+export async function listCompletedJobsByUserAsync(userId: string) {
+  const db = getD1Database();
+
+  if (!db) {
+    return Array.from(jobsStore.values())
+      .filter((job) => job.userId === userId && job.status === 'completed' && Boolean(job.outputPreviewUrl) && !job.deletedAt)
+      .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
+  }
+
+  const rows = await db
+    .prepare(
+      `SELECT id, user_id, input_object_key, output_object_key, restore_settings_json, status, model_name, cost_credits, progress, error_code, error_message, input_preview_url, output_preview_url, replicate_prediction_id, credits_refunded, deleted_at, created_at, updated_at
+       FROM jobs
+       WHERE user_id = ? AND status = 'completed' AND output_preview_url IS NOT NULL AND deleted_at IS NULL
+       ORDER BY created_at DESC
+       LIMIT 60`
+    )
+    .bind(userId)
+    .all<JobRow>();
+
+  return (rows.results ?? []).map(mapJobRow);
+}
+
+// markJobDeletedAsync 对当前用户的任务做软删除，保留账务审计关系。
+export async function markJobDeletedAsync(jobId: string, userId: string) {
+  const existingJob = await getStoredJobAsync(jobId);
+
+  if (!existingJob || existingJob.userId !== userId || existingJob.status !== 'completed' || !existingJob.outputPreviewUrl || existingJob.deletedAt) return null;
+
+  const deletedAt = new Date().toISOString();
+  const updatedJob = await updateStoredJobAsync(jobId, { deletedAt });
+
+  return updatedJob ?? { ...existingJob, deletedAt };
 }
 
 // normalizeReplicateStatus 把 Replicate prediction 状态映射成站内任务状态。
@@ -198,6 +237,7 @@ function mapJobRow(row: JobRow): StoredJob {
     outputPreviewUrl: row.output_preview_url,
     replicatePredictionId: row.replicate_prediction_id,
     creditsRefunded: Boolean(row.credits_refunded),
+    deletedAt: row.deleted_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };

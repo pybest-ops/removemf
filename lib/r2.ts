@@ -1,4 +1,4 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getEnvValue } from './env';
 
@@ -99,6 +99,21 @@ export async function putR2Object(objectKey: string, bytes: Uint8Array, contentT
       Key: objectKey,
       Body: bytes,
       ContentType: contentType
+    })
+  );
+}
+
+// deleteR2Object 删除用户主动移除的结果图对象；未配置 R2 时直接跳过。
+export async function deleteR2Object(objectKey: string) {
+  const config = getR2Config();
+
+  if (!config) return;
+
+  const client = createR2Client(config);
+  await client.send(
+    new DeleteObjectCommand({
+      Bucket: config.bucketName,
+      Key: objectKey
     })
   );
 }
