@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 import { useMemo, useRef, useState } from 'react';
-import type { RestoreMode, WhiteBalanceMode, UploadSignResponse } from '@/lib/types';
+import type { Job, RestoreMode, WhiteBalanceMode, UploadSignResponse } from '@/lib/types';
 import type { ChangeEvent, DragEvent } from 'react';
 import { useJobPolling } from '@/lib/useJobPolling';
 
@@ -30,7 +30,14 @@ export function UploadPageFlow() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { job, isPolling } = useJobPolling(jobId);
 
-  const canSubmit = useMemo(() => Boolean(file && !isSubmitting), [file, isSubmitting]);
+  // activeAiStatuses 表示用户仍在等待 AI Restore 输出的非终态任务。
+  const activeAiStatuses = ['created', 'queued', 'processing'];
+  // isAiRunning 保持按钮与进度卡同步，避免创建任务后按钮过早恢复普通状态。
+  const isAiRunning = isSubmitting || Boolean(jobId && !job) || Boolean(job && activeAiStatuses.includes(job.status));
+  // aiProgressPercent 为提交初期和轮询阶段提供稳定的前端展示百分比。
+  const aiProgressPercent = isSubmitting && !job ? 5 : job?.progress ?? 0;
+  const canSubmit = useMemo(() => Boolean(file && !isAiRunning), [file, isAiRunning]);
+  const aiRestoreSummary = getAiRestoreSummary({ restoreMode, whiteBalanceMode, skinTonePriority });
 
   // selectFile 校验上传图片，并生成本地预览。
   function selectFile(selectedFile: File | null) {
@@ -338,6 +345,8 @@ export function UploadPageFlow() {
                 Use AI Restore when the free preview still leaves a strong cast or when you want a more natural-looking finish.
               </p>
 
+              {isSubmitting || job ? <AiProgressPanel job={job} isPolling={isPolling} isSubmitting={isSubmitting} progress={aiProgressPercent} restoreSummary={aiRestoreSummary} /> : null}
+
               <div className="relative mt-5 grid gap-5">
                 <div className="space-y-4">
                   <div>
@@ -385,41 +394,19 @@ export function UploadPageFlow() {
                     onClick={handleSubmit}
                     type="button"
                   >
-                    {isSubmitting ? 'Creating job...' : user ? 'Restore with AI' : 'Sign in to restore'}
+                    {isAiRunning ? `AI Restore running · ${aiProgressPercent}%` : user ? 'Restore with AI' : 'Sign in to restore'}
                   </button>
                   <Link className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10" href="/pricing">
                     View credits
                   </Link>
                 </div>
               </div>
-
-              {job?.status === 'completed' && job.outputPreviewUrl ? (
-                <div className="relative mt-5 rounded-[1.5rem] border border-white/10 bg-white/10 p-4 backdrop-blur">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-200">AI result ready</p>
-                      <h4 className="mt-1 text-base font-semibold tracking-[-0.02em] text-white">Compare the original and restored image</h4>
-                    </div>
-                    <Link className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/15" href={`/result/${job.jobId}`}>
-                      Open full result
-                    </Link>
-                  </div>
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    <figure>
-                      <img className="max-h-72 w-full rounded-2xl bg-slate-950 object-contain shadow-inner" src={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} alt="Original before AI restore" />
-                      <figcaption className="mt-2 text-xs font-medium text-slate-300">Before</figcaption>
-                    </figure>
-                    <figure>
-                      <img className="max-h-72 w-full rounded-2xl bg-slate-950 object-contain shadow-inner" src={job.outputPreviewUrl} alt="AI restored result" />
-                      <figcaption className="mt-2 text-xs font-medium text-slate-300">After · AI restored</figcaption>
-                    </figure>
-                  </div>
-                </div>
-              ) : null}
             </section>
           </div>
         ) : null}
         </div>
+
+        {job?.status === 'completed' && job.outputPreviewUrl ? <AiResultStudio job={job} originalUrl={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} /> : null}
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           <InfoCard title="Free preview vs AI Restore" text="Free preview is a quick browser pass; AI Restore gives the stronger paid pass." />
@@ -432,15 +419,93 @@ export function UploadPageFlow() {
 
       <div className="border-t border-white/70 bg-white/45 px-5 py-4 text-sm text-slate-600 md:px-7">
         {errorMessage ? <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-semibold text-red-700">{errorMessage === 'INSUFFICIENT_CREDITS' ? 'You need credits before restoring this image.' : errorMessage}</p> : null}
-        {!errorMessage ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">{job ? `Status: ${job.status} (${job.progress}%)` : 'Free preview stays in your browser. AI Restore uploads the selected image for processing.'}</p> : null}
-        {job?.restoreMode || job?.whiteBalanceMode || job?.skinTonePriority ? (
-          <p className="mt-2 px-4 text-slate-500">
-            {[job.restoreMode === 'light' ? 'Light restore' : job.restoreMode === 'strong' ? 'Strong restore' : 'Natural restore', job.whiteBalanceMode === 'soft' ? 'Soft white balance' : job.whiteBalanceMode === 'strong' ? 'Strong white balance' : 'Standard white balance', job.skinTonePriority ? 'Skin tone priority' : null].filter(Boolean).join(' · ')}
-          </p>
-        ) : null}
-        {isPolling ? <p className="mt-2 px-4 font-semibold text-matcha-700">Checking result...</p> : null}
+        {!errorMessage && !job ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">Free preview stays in your browser. AI Restore uploads the selected image for processing.</p> : null}
       </div>
     </div>
+  );
+}
+
+// getJobStageLabel 将任务状态和进度转换为用户可理解的处理阶段。
+function getJobStageLabel({ isPolling, isSubmitting, job, progress }: { isPolling: boolean; isSubmitting: boolean; job: Job | null; progress: number }) {
+  if (isSubmitting && !job) return 'Creating job';
+  if (!job) return 'Ready to start';
+  if (job.status === 'created') return 'Queued';
+  if (job.status === 'queued') return 'Queued';
+  if (job.status === 'processing' && progress >= 90) return 'Finalizing';
+  if (job.status === 'processing') return isPolling ? 'Processing' : 'Checking result';
+  if (job.status === 'completed') return 'Result ready';
+  if (job.status === 'failed') return 'Failed';
+  if (job.status === 'expired') return 'Expired';
+  return 'Checking result';
+}
+
+// getAiRestoreSummary 汇总用户选择的 AI Restore 参数，方便在进度卡中持续展示。
+function getAiRestoreSummary({ restoreMode, skinTonePriority, whiteBalanceMode }: { restoreMode: RestoreMode; skinTonePriority: boolean; whiteBalanceMode: WhiteBalanceMode }) {
+  return [restoreMode === 'light' ? 'Light restore' : restoreMode === 'strong' ? 'Strong restore' : 'Natural restore', whiteBalanceMode === 'soft' ? 'Soft white balance' : whiteBalanceMode === 'strong' ? 'Strong white balance' : 'Standard white balance', skinTonePriority ? 'Skin tone priority' : null].filter(Boolean).join(' · ');
+}
+
+// AiProgressPanel 在 AI Restore 面板内展示强视觉进度，避免用户错过底部状态。
+function AiProgressPanel({ isPolling, isSubmitting, job, progress, restoreSummary }: { isPolling: boolean; isSubmitting: boolean; job: Job | null; progress: number; restoreSummary: string }) {
+  const safeProgress = Math.max(0, Math.min(100, progress));
+  const stageLabel = getJobStageLabel({ isPolling, isSubmitting, job, progress: safeProgress });
+  const isTerminalError = job?.status === 'failed' || job?.status === 'expired';
+  const panelTone = isTerminalError ? 'border-red-300/30 bg-red-950/25' : job?.status === 'completed' ? 'border-matcha-300/30 bg-matcha-300/10' : 'border-white/10 bg-white/10';
+
+  return (
+    <div className={`relative mt-5 overflow-hidden rounded-[1.5rem] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur ${panelTone}`}>
+      <div className="pointer-events-none absolute -right-8 top-2 h-20 w-20 rounded-full bg-cyan-300/20 blur-2xl" />
+      <div className="relative flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-200">AI processing</p>
+          <h4 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-white">{stageLabel}</h4>
+          <p className="mt-2 text-xs leading-5 text-slate-300">{isTerminalError ? job?.errorMessage ?? 'The AI Restore did not produce a result. You can retry with the same photo.' : restoreSummary}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-4xl font-semibold tracking-[-0.06em] text-white">{safeProgress}%</p>
+          <p className="mt-1 text-xs font-medium text-slate-400">{job?.jobId ? 'Job active' : 'Starting'}</p>
+        </div>
+      </div>
+      <div className="relative mt-4 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
+        <div className="h-full rounded-full bg-gradient-to-r from-matcha-300 via-emerald-300 to-cyan-300 shadow-[0_0_24px_rgba(103,232,249,0.35)] transition-all duration-700" style={{ width: `${safeProgress}%` }} />
+      </div>
+      <div className="relative mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+        <span>{job?.status ? `Status: ${job.status}` : 'Creating upload and job records'}</span>
+        <span>{isPolling ? 'Checking result automatically' : job?.status === 'completed' ? 'Preview is ready below' : 'Waiting for next step'}</span>
+      </div>
+    </div>
+  );
+}
+
+// AiResultStudio 在上传页直接展示完整 AI 结果，不强制用户跳转到结果页。
+function AiResultStudio({ job, originalUrl }: { job: Job; originalUrl?: string }) {
+  return (
+    <section className="mt-5 overflow-hidden rounded-[2rem] border border-white/70 bg-white/75 p-5 shadow-[0_24px_80px_rgba(31,82,44,0.14)] backdrop-blur-xl md:p-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">AI Result Studio</p>
+          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">Your restored image is ready here.</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Review the AI Restore output directly on this page. Natural result, not exact original.</p>
+        </div>
+        <a className="inline-flex justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href={job.outputPreviewUrl} rel="noreferrer" target="_blank">
+          Open image in new tab
+        </a>
+      </div>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-[0.82fr_1.18fr]">
+        <figure className="rounded-[1.5rem] border border-white/80 bg-white/70 p-3 shadow-inner">
+          {originalUrl ? <img className="max-h-[24rem] w-full rounded-[1.15rem] bg-slate-100 object-contain" src={originalUrl} alt="Original before AI restore" /> : <div className="flex h-72 items-center justify-center rounded-[1.15rem] bg-slate-100 text-sm text-slate-500">Original image not available</div>}
+          <figcaption className="mt-3 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Before</figcaption>
+        </figure>
+        <figure className="relative overflow-hidden rounded-[1.5rem] border border-matcha-200/70 bg-slate-950 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.22)]">
+          <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-matcha-300/20 blur-3xl" />
+          <img className="relative max-h-[34rem] w-full rounded-[1.15rem] bg-slate-900 object-contain" src={job.outputPreviewUrl} alt="AI restored full result" />
+          <figcaption className="relative mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-matcha-200">
+            <span>After · AI restored</span>
+            <span>{job.progress}% complete</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
   );
 }
 
