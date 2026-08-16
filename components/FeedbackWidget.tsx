@@ -1,7 +1,9 @@
 'use client';
 
+import { AppMessage } from '@/components/AppMessage';
+import type { AppMessageNotice } from '@/components/AppMessage';
 import { usePathname } from 'next/navigation';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 type FeedbackType = 'idea' | 'bug' | 'praise' | 'other';
 
@@ -31,11 +33,14 @@ export function FeedbackWidget() {
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('idea');
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // notice 保存当前反馈提交触发的页面级轻提示。
+  const [notice, setNotice] = useState<AppMessageNotice | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isVisible = useMemo(() => visiblePaths.has(pathname), [pathname]);
   const remainingCharacters = maxMessageLength - message.length;
+
+  // handleMessageClose 关闭顶部轻提示，供自动关闭和手动关闭复用。
+  const handleMessageClose = useCallback(() => setNotice(null), []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -54,8 +59,7 @@ export function FeedbackWidget() {
 
   // handleOpen 打开反馈弹窗，并清理上一次提交后的提示状态。
   function handleOpen() {
-    setErrorMessage(null);
-    setSuccessMessage(null);
+    setNotice(null);
     setIsOpen(true);
   }
 
@@ -69,18 +73,17 @@ export function FeedbackWidget() {
   // handleSubmit 校验并提交用户反馈到后端接口。
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setErrorMessage(null);
-    setSuccessMessage(null);
+    setNotice(null);
 
     const trimmedMessage = message.trim();
 
     if (!trimmedMessage) {
-      setErrorMessage('Please write a message before sending feedback.');
+      setNotice({ type: 'error', text: 'Please write a message before sending feedback.' });
       return;
     }
 
     if (trimmedMessage.length > maxMessageLength) {
-      setErrorMessage(`Feedback must be ${maxMessageLength} characters or less.`);
+      setNotice({ type: 'error', text: `Feedback must be ${maxMessageLength} characters or less.` });
       return;
     }
 
@@ -104,9 +107,9 @@ export function FeedbackWidget() {
       setMessage('');
       setContact('');
       setFeedbackType('idea');
-      setSuccessMessage('Thanks — your feedback was sent.');
+      setNotice({ type: 'success', text: 'Thanks — your feedback was sent.' });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to send feedback right now.');
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to send feedback right now.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -114,6 +117,8 @@ export function FeedbackWidget() {
 
   return (
     <>
+      <AppMessage notice={notice} onClose={handleMessageClose} />
+
       <button
         aria-haspopup="dialog"
         className="fixed bottom-4 right-4 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-violet-400 via-matcha-300 to-cyan-300 text-slate-950 shadow-[0_14px_36px_rgba(39,131,58,0.20)] ring-1 ring-white/70 transition duration-300 hover:-translate-y-0.5 hover:brightness-105 focus:outline-none focus:ring-4 focus:ring-matcha-300/45 md:bottom-7 md:right-7 md:h-auto md:w-auto md:gap-2 md:px-4 md:py-2.5 md:text-xs md:font-extrabold md:uppercase md:tracking-[0.16em]"
@@ -189,9 +194,6 @@ export function FeedbackWidget() {
                   value={contact}
                 />
               </label>
-
-              {errorMessage ? <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{errorMessage}</p> : null}
-              {successMessage ? <p className="mt-5 rounded-2xl border border-matcha-200 bg-matcha-50 px-4 py-3 text-sm font-semibold text-matcha-800">{successMessage}</p> : null}
 
               <button
                 className="mt-4 inline-flex w-full justify-center rounded-full bg-gradient-to-r from-violet-400 via-matcha-300 to-cyan-300 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.18em] text-slate-950 shadow-lg shadow-emerald-400/20 transition hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60 md:text-sm"
