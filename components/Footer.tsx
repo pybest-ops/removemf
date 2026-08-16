@@ -1,5 +1,48 @@
 import Link from 'next/link';
 
+// partnerBadges 定义页脚合作徽章，供循环滚动轨道重复渲染。
+const partnerBadges = [
+  {
+    href: 'https://submito.net',
+    title: 'Listed on Submito',
+    img: <img className="h-auto w-full" src="https://submito.net/badge/listed-light.svg" alt="Listed on Submito" />
+  },
+  {
+    href: 'https://launchpadly.co/startup/remove-matcha-filter?ref=badge',
+    title: 'Launchpadly Startup Directory',
+    img: <img src="https://launchpadly.co/embed/badges/startup/remove-matcha-filter.svg?variant=light" alt="Launchpadly Startup Directory" width="220" height="48" style={{ display: 'block', border: 0, width: '100%', height: 'auto' }} />,
+    badgeProps: {
+      'data-launchpadly-badge': 'remove-matcha-filter',
+      'data-launchpadly-badge-variant': 'light'
+    }
+  },
+  {
+    href: 'https://postyourstartup.co/startup/remove-matcha-filter?ref=badge',
+    title: 'Featured on PostYourStartup',
+    img: <img className="h-auto w-full" src="https://postyourstartup.co/api/badge/remove-matcha-filter?theme=light" alt="Featured on PostYourStartup" width="212" height="55" />
+  },
+  {
+    href: 'https://smollist.com/projects/remove-matcha-filter-ai?utm_source=badge',
+    title: 'Featured on Smol List',
+    img: <img src="https://r2.direasy-multi-tenant.focusapps.app/uploads/616d0b1a-3979-4b8c-94d1-b4f1fedd3ead/1783046749147/q1b2bvmvyl/featured-on-light.svg" alt="Featured on Smol List" style={{ height: '44px', width: '100%' }} />
+  },
+  {
+    href: 'https://findly.tools/remove-matcha-filter?utm_source=remove-matcha-filter',
+    title: 'Featured on Findly.tools',
+    img: <img className="h-auto w-full" src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="175" height="55" />
+  },
+  {
+    href: 'https://saastool.site/item/remove-matcha-filter',
+    title: 'Featured on SaaSTool.site',
+    img: <img src="https://saastool.site/badges/saastool-light.svg" alt="Featured on SaaSTool.site" height="54" width="auto" />
+  },
+  {
+    href: 'https://aitop10.tools/',
+    title: 'AiTop10 Tools',
+    img: 'AiTop10 Tools'
+  }
+] as const;
+
 // Footer 提供全站必须保留的合规入口和联系邮箱。
 export function Footer() {
   return (
@@ -18,25 +61,39 @@ export function Footer() {
           </a>
         </nav>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <a className="flex w-[120px] justify-center" href="https://submito.net" target="_blank" rel="noopener noreferrer" title="Listed on Submito">
-          <img className="w-full h-auto" src="https://submito.net/badge/listed-light.svg" alt="Listed on Submito" />
-        </a>
-        <a className="flex w-[120px] justify-center" href="https://launchpadly.co/startup/remove-matcha-filter?ref=badge" target="_blank" rel="noopener noreferrer" data-launchpadly-badge="remove-matcha-filter" data-launchpadly-badge-variant="light" title="Launchpadly Startup Directory">
-          <img src="https://launchpadly.co/embed/badges/startup/remove-matcha-filter.svg?variant=light" alt="Launchpadly Startup Directory" width="220" height="48" style={{ display: 'block', border: 0, width: '100%', height: 'auto' }} />
-        </a>
-        <a className="flex w-[120px] justify-center" href="https://postyourstartup.co/startup/remove-matcha-filter?ref=badge" target="_blank" rel="noopener noreferrer" title="Featured on PostYourStartup">
-          <img className="h-auto w-full" src="https://postyourstartup.co/api/badge/remove-matcha-filter?theme=light" alt="Featured on PostYourStartup" width="212" height="55" />
-        </a>
-        <a className="flex w-[120px] justify-center" href="https://smollist.com/projects/remove-matcha-filter-ai?utm_source=badge" target="_blank" rel="noopener noreferrer" title="Featured on Smol List">
-          <img src="https://r2.direasy-multi-tenant.focusapps.app/uploads/616d0b1a-3979-4b8c-94d1-b4f1fedd3ead/1783046749147/q1b2bvmvyl/featured-on-light.svg" alt="Featured on Smol List" style={{ height: '44px', width: '100%' }} />
-        </a>
-        <a className="flex w-[120px] justify-center" href="https://findly.tools/remove-matcha-filter?utm_source=remove-matcha-filter" target="_blank" rel="noopener noreferrer" title="Featured on Findly.tools">
-          <img className="h-auto w-full" src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="175" height="55" />
-        </a>
-        <a className="inline-flex w-[120px] justify-center text-center" href="https://aitop10.tools/" target="_blank" rel="noopener noreferrer">
-          AiTop10 Tools
-        </a>
+      <div className="overflow-hidden">
+        <div className="flex w-max flex-nowrap items-center justify-start gap-3 animate-partner-marquee">
+          <div className="flex flex-nowrap items-center gap-3">
+            {partnerBadges.map((badge) => (
+              <a
+                className="flex w-[120px] shrink-0 justify-center"
+                href={badge.href}
+                key={badge.href}
+                rel="noopener noreferrer"
+                target="_blank"
+                title={badge.title}
+                {...('badgeProps' in badge ? badge.badgeProps : {})}
+              >
+                {typeof badge.img === 'string' ? badge.img : badge.img}
+              </a>
+            ))}
+          </div>
+          <div className="flex flex-nowrap items-center gap-3" aria-hidden="true">
+            {partnerBadges.map((badge) => (
+              <a
+                className="flex w-[120px] shrink-0 justify-center"
+                href={badge.href}
+                key={`${badge.href}-clone`}
+                rel="noopener noreferrer"
+                target="_blank"
+                title={badge.title}
+                {...('badgeProps' in badge ? badge.badgeProps : {})}
+              >
+                {typeof badge.img === 'string' ? badge.img : badge.img}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </footer>
   );
