@@ -99,7 +99,7 @@ export default function HowToRemoveMatchaFilterPage() {
           If a photo looks too green, yellow, muted, or cloudy after a social filter, start with a simple cleanup path. Upload the saved image, process free in browser, then use AI Restore only when the tint still needs a stronger correction.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/upload">
+          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/matcha-filter-remover">
             Upload a photo
           </Link>
           <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href="/pricing">

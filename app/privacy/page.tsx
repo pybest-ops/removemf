@@ -60,7 +60,7 @@ const privacySections = [
 const relatedLinks = [
   { href: '/terms', label: 'Read Terms' },
   { href: '/refund', label: 'Refund rules' },
-  { href: '/upload', label: 'Upload a photo' }
+  { href: '/matcha-filter-remover', label: 'Upload a photo' }
 ];
 
 // PrivacyPage 展示 Premium Legal Hub 风格的隐私政策。

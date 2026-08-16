@@ -33,10 +33,6 @@ export function BeforeAfterSlider() {
       <div className="pointer-events-none absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-xs font-semibold text-slate-900 shadow-[0_18px_45px_rgba(15,23,42,0.25)] backdrop-blur sm:h-12 sm:w-12 sm:text-sm" style={{ left: `${sliderValue}%` }}>
         ↔
       </div>
-      <div className="pointer-events-none absolute bottom-3 left-3 right-3 flex items-center justify-center rounded-2xl border border-white/20 bg-slate-950/55 px-3 py-2 text-[10px] font-medium text-white shadow-lg backdrop-blur sm:bottom-4 sm:left-4 sm:right-4 sm:justify-between sm:px-4 sm:py-3 sm:text-xs">
-        <span>Drag to compare</span>
-        <span className="hidden text-matcha-100 sm:inline">Natural color recovery</span>
-      </div>
     </div>
   );
 }

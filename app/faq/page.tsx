@@ -107,7 +107,7 @@ export default function FaqPage() {
               Clear answers about results, limits, uploads, privacy, Free preview, AI Restore, and credits before you process a photo.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/upload">
+              <Link className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/matcha-filter-remover">
                 Upload a photo
               </Link>
               <Link className="rounded-full border border-matcha-200 bg-white/70 px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white" href="/pricing">
@@ -192,7 +192,7 @@ function CtaSection() {
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Ready to test one photo?</p>
       <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950">Try Free preview before you spend a credit.</h2>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <Link className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/upload">
+        <Link className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/matcha-filter-remover">
           Upload a photo
         </Link>
         <Link className="rounded-full border border-matcha-200 bg-white/70 px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white" href="/pricing">

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 // navItems 定义全站顶部导航的核心入口。
 const navItems = [
-  { href: '/upload', label: 'Upload' },
+  { href: '/matcha-filter-remover', label: 'Remove' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/my-images', label: 'My Images' },
   { href: '/blog', label: 'Blog' },

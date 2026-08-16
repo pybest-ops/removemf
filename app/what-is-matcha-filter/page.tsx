@@ -45,6 +45,7 @@ const articleSections = [
     title: 'What people usually mean by a matcha filter',
     body: [
       'On this site, a matcha filter means a photo-editing look that pushes the whole image toward green, yellow, olive, or muted beige. The name is informal. People use it because the color mood can look a bit like matcha powder mixed into the photo: soft, greenish, and slightly cloudy.',
+      'This matcha-style look is also common in TikTok and YouTube edits, where creators use muted green, yellow, olive, or beige tones to make portraits, food, travel, and lifestyle clips feel softer, calmer, or more cinematic.',
       'That look can be intentional. Some social filters use it to make photos feel calmer, less contrasty, or more film-like. The problem starts when the filter is baked into a saved image and you no longer have the original file. At that point, the photo may look stylish in a feed, but strange when you want a clean profile picture, product photo, document image, food shot, or family photo.'
     ]
   },
@@ -93,7 +94,7 @@ export default function WhatIsMatchaFilterPage() {
           A matcha filter is a green or yellow color cast that makes a photo feel soft, muted, or slightly cloudy. It can be a deliberate style, but it becomes annoying when you only have the saved filtered photo and want the image to look normal again.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/upload">
+          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/matcha-filter-remover">
             Remove matcha filter
           </Link>
           <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href="/how-to-remove-matcha-filter">

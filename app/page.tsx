@@ -137,7 +137,7 @@ function HeroSection() {
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-slate-950 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-matcha-800" href="/upload">
+          <Link className="rounded-full bg-slate-950 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-matcha-800" href="/matcha-filter-remover">
             Upload a photo
           </Link>
           <Link className="rounded-full border border-matcha-200 bg-white/70 px-7 py-3.5 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-matcha-300 hover:bg-white" href="/pricing">

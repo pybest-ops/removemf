@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 // metadata 声明上传页的规范地址，避免入口页面被识别为重复内容。
 export const metadata: Metadata = {
   alternates: {
-    canonical: '/upload'
+    canonical: '/matcha-filter-remover'
   }
 };
 

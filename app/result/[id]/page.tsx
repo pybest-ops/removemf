@@ -42,7 +42,7 @@ export default async function ResultPage({ params }: { params: { id: string } })
               Open result image
             </a>
           ) : null}
-          <Link className="mt-7 inline-flex rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white" href="/upload">
+          <Link className="mt-7 inline-flex rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white" href="/matcha-filter-remover">
             Restore another photo
           </Link>
         </aside>

@@ -21,7 +21,7 @@ const feedbackTypes: Array<{ icon: string; label: string; value: FeedbackType }>
 ];
 
 // visiblePaths 控制反馈入口只出现在核心转化页面。
-const visiblePaths = new Set(['/', '/upload', '/pricing']);
+const visiblePaths = new Set(['/', '/matcha-filter-remover', '/pricing']);
 
 // maxMessageLength 与服务端校验保持一致，避免用户提交后才发现超长。
 const maxMessageLength = 2000;

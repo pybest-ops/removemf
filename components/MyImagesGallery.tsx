@@ -127,7 +127,7 @@ export function MyImagesGallery() {
   if (!images.length) {
     return (
       <GalleryShell eyebrow="No AI Restore images yet" title="Your private gallery is empty." text="Only completed AI Restore results appear here. Free preview images stay in your browser and are not saved to history.">
-        <a className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/upload">
+        <a className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/matcha-filter-remover">
           Upload a photo
         </a>
       </GalleryShell>
