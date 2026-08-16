@@ -37,8 +37,28 @@ a {
   animation: glow-drift 12s ease-in-out infinite;
 }
 
+/* partner-marquee 为页脚合作徽章提供无缝横向循环滚动。 */
+@keyframes partner-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-partner-marquee {
+  animation: partner-marquee 28s linear infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-glow-drift {
+    animation: none;
+  }
+
+  .animate-partner-marquee {
     animation: none;
   }
 }
