@@ -1,0 +1,14 @@
+components/Footer.tsx
+  ai_agent 3-45,64-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "0914e98eb3339ffc77d346fa525bd5bf2eee7788",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
