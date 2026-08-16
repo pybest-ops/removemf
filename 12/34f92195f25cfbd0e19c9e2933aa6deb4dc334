@@ -1,0 +1,48 @@
+app/faq/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 110,195
+app/upload/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 9
+app/matcha-filter-remover/page.tsx
+  s_c684b80e84b1bd::t_3fcba7cb088cc8 1
+app/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 140
+app/sitemap.ts
+  s_c684b80e84b1bd::t_ca995ddf954a77 7
+app/result/[id]/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 45
+app/layout.tsx
+  s_c684b80e84b1bd::t_3fcba7cb088cc8 28
+components/UploadPageFlow.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 165,183,206
+app/how-to-remove-matcha-filter/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 102
+app/privacy/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 63
+components/FeedbackWidget.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 24
+components/MyImagesGallery.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 130
+app/what-is-matcha-filter/page.tsx
+  s_c684b80e84b1bd::t_ca995ddf954a77 97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "1234f92195f25cfbd0e19c9e2933aa6deb4dc334",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  },
+  "sessions": {
+    "s_c684b80e84b1bd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0091c-42a6-7372-a020-5a025a2cddea",
+        "model": "gpt-5.5"
+      },
+      "human_author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
