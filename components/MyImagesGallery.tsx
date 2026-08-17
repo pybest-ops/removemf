@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { localizePath } from '@/lib/i18n/config';
+import { interpolate } from '@/lib/i18n/dictionaries';
+import { useI18n } from './i18n/I18nProvider';
 
 // HistoryImage 表示我的图片页展示所需的最小 AI Restore 结果字段。
 type HistoryImage = {
@@ -18,6 +21,8 @@ type GalleryStatus = 'loading' | 'authenticated' | 'unauthenticated' | 'error';
 
 // MyImagesGallery 展示当前用户已完成的 AI Restore 历史图片。
 export function MyImagesGallery() {
+  const { dictionary, locale } = useI18n();
+  const copy = dictionary.myImages.gallery;
   const [images, setImages] = useState<HistoryImage[]>([]);
   const [status, setStatus] = useState<GalleryStatus>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -48,7 +53,7 @@ export function MyImagesGallery() {
       } catch {
         if (!isActive) return;
 
-        setErrorMessage('Your images could not be loaded. Please refresh and try again.');
+        setErrorMessage(copy.error.title);
         setStatus('error');
       }
     }
@@ -79,7 +84,7 @@ export function MyImagesGallery() {
       link.click();
       link.remove();
     } catch {
-      setErrorMessage('Download could not start. Please try again.');
+      setErrorMessage(copy.error.title);
     }
   }
 
@@ -100,35 +105,35 @@ export function MyImagesGallery() {
       if (!response.ok) throw new Error('delete_failed');
     } catch {
       setImages(previousImages);
-      setErrorMessage('This image could not be deleted. Please try again.');
+      setErrorMessage(copy.error.title);
     } finally {
       setDeletingJobId(null);
     }
   }
 
   if (status === 'loading') {
-    return <GalleryShell eyebrow="Loading vault" title="Checking your private image history." text="We are looking for completed AI Restore results from your signed-in account." />;
+    return <GalleryShell eyebrow={copy.loading.eyebrow} title={copy.loading.title} text={copy.loading.text} />;
   }
 
   if (status === 'unauthenticated') {
     return (
-      <GalleryShell eyebrow="Sign in required" title="Your image history is private." text="Sign in with Google to view AI Restore results saved to your account.">
-        <button className="mt-6 rounded-full bg-gradient-to-r from-matcha-500 via-emerald-500 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(34,197,94,0.22)] transition hover:-translate-y-0.5 hover:brightness-105" onClick={() => startGoogleLogin('/my-images')} type="button">
-          Sign in to view images
+      <GalleryShell eyebrow={copy.signedOut.eyebrow} title={copy.signedOut.title} text={copy.signedOut.text}>
+        <button className="mt-6 rounded-full bg-gradient-to-r from-matcha-500 via-emerald-500 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(34,197,94,0.22)] transition hover:-translate-y-0.5 hover:brightness-105" onClick={() => startGoogleLogin(localizePath('/my-images', locale))} type="button">
+          {copy.signedOut.cta}
         </button>
       </GalleryShell>
     );
   }
 
   if (status === 'error') {
-    return <GalleryShell eyebrow="Loading failed" title="Your image history is temporarily unavailable." text={errorMessage ?? 'Please refresh and try again.'} />;
+    return <GalleryShell eyebrow={copy.error.eyebrow} title={copy.error.title} text={errorMessage ?? copy.error.retry} />;
   }
 
   if (!images.length) {
     return (
-      <GalleryShell eyebrow="No AI Restore images yet" title="Your private gallery is empty." text="Only completed AI Restore results appear here. Free preview images stay in your browser and are not saved to history.">
-        <a className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/matcha-filter-remover">
-          Upload a photo
+      <GalleryShell eyebrow={copy.empty.eyebrow} title={copy.empty.title} text={copy.empty.text}>
+        <a className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href={localizePath('/matcha-filter-remover', locale)}>
+          {copy.empty.cta}
         </a>
       </GalleryShell>
     );
@@ -138,10 +143,10 @@ export function MyImagesGallery() {
     <section className="rounded-[2.5rem] border border-white/70 bg-white/65 p-5 shadow-[0_30px_100px_rgba(31,82,44,0.12)] backdrop-blur-xl md:p-8">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-matcha-700">Private gallery</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-4xl">Your AI Restore history.</h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-matcha-700">{copy.title}</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-4xl">{dictionary.myImages.title}</h2>
         </div>
-        <p className="max-w-md text-sm leading-6 text-slate-500">{images.length} saved AI Restore {images.length === 1 ? 'result' : 'results'} · Free preview images are not stored here.</p>
+        <p className="max-w-md text-sm leading-6 text-slate-500">{interpolate(copy.subtitle, { count: images.length })}</p>
       </div>
 
       {errorMessage ? <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{errorMessage}</p> : null}
@@ -157,13 +162,13 @@ export function MyImagesGallery() {
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-matcha-700">AI Restore</p>
               <h3 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-slate-950">Restored image</h3>
               <p className="mt-2 text-sm text-slate-500">Created {formatDate(image.createdAt)}</p>
-              <p className="mt-3 rounded-2xl bg-matcha-50 px-3 py-2 text-xs font-medium leading-5 text-matcha-900">{formatRestoreSummary(image)}</p>
+              <p className="mt-3 rounded-2xl bg-matcha-50 px-3 py-2 text-xs font-medium leading-5 text-matcha-900">{formatRestoreSummary(image, copy)}</p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <button className="rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-matcha-800" onClick={() => void handleDownload(image)} type="button">
-                  Download
+                  {copy.download}
                 </button>
                 <button className="rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:-translate-y-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60" disabled={deletingJobId === image.jobId} onClick={() => void handleDelete(image)} type="button">
-                  {deletingJobId === image.jobId ? 'Deleting...' : 'Delete'}
+                  {deletingJobId === image.jobId ? copy.deleting : copy.delete}
                 </button>
               </div>
             </div>
@@ -189,8 +194,8 @@ function GalleryShell({ children, eyebrow, text, title }: { children?: React.Rea
 }
 
 // formatRestoreSummary 把 AI Restore 设置转换成图片卡片内的短说明。
-function formatRestoreSummary(image: HistoryImage) {
-  return [image.restoreMode === 'light' ? 'Light restore' : image.restoreMode === 'strong' ? 'Strong restore' : 'Natural restore', image.whiteBalanceMode === 'soft' ? 'Soft white balance' : image.whiteBalanceMode === 'strong' ? 'Strong white balance' : 'Standard white balance', image.skinTonePriority ? 'Skin tone priority' : null].filter(Boolean).join(' · ');
+function formatRestoreSummary(image: HistoryImage, copy: ReturnType<typeof useI18n>['dictionary']['myImages']['gallery']) {
+  return [image.restoreMode === 'light' ? copy.modes.light : image.restoreMode === 'strong' ? copy.modes.strong : copy.modes.natural, image.whiteBalanceMode === 'soft' ? copy.modes.soft : image.whiteBalanceMode === 'strong' ? copy.modes.strongWhite : copy.modes.standard, image.skinTonePriority ? copy.modes.skin : null].filter(Boolean).join(' · ');
 }
 
 // formatDate 把服务端时间转换为用户本地可读日期。

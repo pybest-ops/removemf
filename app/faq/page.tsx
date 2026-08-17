@@ -1,13 +1,18 @@
 import { Footer } from '@/components/Footer';
+import { localizePath } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { createI18nMetadata } from '@/lib/i18n/metadata';
+import { getRequestLocale } from '@/lib/i18n/server';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
 // metadata 声明 FAQ 页的规范地址，避免问答内容被识别为重复页面。
-export const metadata: Metadata = {
-  alternates: {
-    canonical: '/faq'
-  }
-};
+export function generateMetadata(): Metadata {
+  const locale = getRequestLocale();
+  const dictionary = getDictionary(locale);
+
+  return createI18nMetadata(locale, '/faq', dictionary.metadata.faq);
+}
 
 // trustItems 概括 FAQ 页面最需要提前建立的用户预期。
 const trustItems = ['Natural result, not exact original', 'Free preview first', 'AI Restore uses credits'];
@@ -90,6 +95,8 @@ const faqGroups = [
 
 // FaqPage 解释 AI 恢复能力、上传数据和 credits 预期。
 export default function FaqPage() {
+  const locale = getRequestLocale();
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-6 py-10">
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-matcha-200/45 blur-3xl animate-glow-drift" />
@@ -143,7 +150,7 @@ export default function FaqPage() {
           </div>
         </section>
 
-        <CtaSection />
+        <CtaSection locale={locale} />
         <Footer />
       </div>
     </main>
@@ -186,16 +193,16 @@ function FaqCard({ item, highlighted }: { item: { question: string; answer: stri
 }
 
 // CtaSection 在 FAQ 读完后给出下一步上传或查看定价入口。
-function CtaSection() {
+function CtaSection({ locale }: { locale: ReturnType<typeof getRequestLocale> }) {
   return (
     <section className="mt-8 rounded-[2.5rem] border border-white/70 bg-white/65 p-6 text-center shadow-[0_30px_100px_rgba(31,82,44,0.12)] backdrop-blur-xl md:p-8">
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Ready to test one photo?</p>
       <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950">Try Free preview before you spend a credit.</h2>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <Link className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href="/matcha-filter-remover">
+        <Link className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href={localizePath('/matcha-filter-remover', locale)}>
           Upload a photo
         </Link>
-        <Link className="rounded-full border border-matcha-200 bg-white/70 px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white" href="/pricing">
+        <Link className="rounded-full border border-matcha-200 bg-white/70 px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white" href={localizePath('/pricing', locale)}>
           View pricing
         </Link>
       </div>

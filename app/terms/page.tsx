@@ -1,13 +1,18 @@
 import { Footer } from '@/components/Footer';
+import { localizePath } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { createI18nMetadata } from '@/lib/i18n/metadata';
+import { getRequestLocale } from '@/lib/i18n/server';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
 // metadata 声明服务条款页的规范地址，避免法律页面被识别为重复内容。
-export const metadata: Metadata = {
-  alternates: {
-    canonical: '/terms'
-  }
-};
+export function generateMetadata(): Metadata {
+  const locale = getRequestLocale();
+  const dictionary = getDictionary(locale);
+
+  return createI18nMetadata(locale, '/terms', dictionary.metadata.terms);
+}
 
 // termsHighlights 用于在首屏快速说明服务条款的核心使用边界。
 const termsHighlights = [
@@ -69,6 +74,8 @@ const relatedLinks = [
 
 // TermsPage 展示 Premium Legal Hub 风格的服务条款。
 export default function TermsPage() {
+  const locale = getRequestLocale();
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-6 py-10">
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-matcha-200/45 blur-3xl animate-glow-drift" />
@@ -144,7 +151,7 @@ export default function TermsPage() {
           </div>
           <div className="mt-6 flex flex-wrap gap-3 md:mt-0">
             {relatedLinks.map((link) => (
-              <Link className="rounded-full border border-matcha-200 bg-white/80 px-5 py-3 text-sm font-semibold text-matcha-900 shadow-sm transition hover:-translate-y-0.5 hover:border-matcha-400 hover:shadow-md" href={link.href} key={link.href}>
+              <Link className="rounded-full border border-matcha-200 bg-white/80 px-5 py-3 text-sm font-semibold text-matcha-900 shadow-sm transition hover:-translate-y-0.5 hover:border-matcha-400 hover:shadow-md" href={localizePath(link.href, locale)} key={link.href}>
                 {link.label}
               </Link>
             ))}

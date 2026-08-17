@@ -2,10 +2,17 @@
 
 import Link from 'next/link';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { localizePath } from '@/lib/i18n/config';
+import { interpolate } from '@/lib/i18n/dictionaries';
+import type { Dictionary } from '@/lib/i18n/dictionaries';
+import { useI18n } from './i18n/I18nProvider';
 import { useMemo, useRef, useState } from 'react';
 import type { Job, RestoreMode, WhiteBalanceMode, UploadSignResponse } from '@/lib/types';
 import type { ChangeEvent, DragEvent } from 'react';
 import { useJobPolling } from '@/lib/useJobPolling';
+
+// UploadFlowCopy 定义上传交互组件内部消费的语言包片段。
+type UploadFlowCopy = Dictionary['upload']['flow'];
 
 // maxSizeBytes 限制用户首版上传图片体积，避免未接存储前就放大处理成本。
 const maxSizeBytes = 10 * 1024 * 1024;
@@ -15,6 +22,8 @@ const supportedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 // UploadPageFlow 提供免费浏览器本地基础修图，并引导用户升级到付费 AI Restore。
 export function UploadPageFlow() {
+  const { dictionary, locale } = useI18n();
+  const copy = dictionary.upload.flow;
   const { creditsBalance, status, user } = useCurrentUser();
   const [file, setFile] = useState<File | null>(null);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
@@ -37,7 +46,7 @@ export function UploadPageFlow() {
   // aiProgressPercent 为提交初期和轮询阶段提供稳定的前端展示百分比。
   const aiProgressPercent = isSubmitting && !job ? 5 : job?.progress ?? 0;
   const canSubmit = useMemo(() => Boolean(file && !isAiRunning), [file, isAiRunning]);
-  const aiRestoreSummary = getAiRestoreSummary({ restoreMode, whiteBalanceMode, skinTonePriority });
+  const aiRestoreSummary = getAiRestoreSummary({ copy, restoreMode, whiteBalanceMode, skinTonePriority });
 
   // selectFile 校验上传图片，并生成本地预览。
   function selectFile(selectedFile: File | null) {
@@ -53,14 +62,14 @@ export function UploadPageFlow() {
     }
 
     if (!supportedTypes.includes(selectedFile.type)) {
-      setErrorMessage('Please upload a JPG, PNG, or WEBP image.');
+      setErrorMessage(copy.errors.type);
       setFile(null);
       setLocalPreviewUrl(null);
       return;
     }
 
     if (selectedFile.size > maxSizeBytes) {
-      setErrorMessage('Please upload an image smaller than 10MB.');
+      setErrorMessage(copy.errors.size);
       setFile(null);
       setLocalPreviewUrl(null);
       return;
@@ -151,7 +160,7 @@ export function UploadPageFlow() {
       context.putImageData(imageData, 0, 0);
       setFreeResultUrl(canvas.toDataURL(file.type || 'image/png', 0.9));
     } catch {
-      setErrorMessage('Free cleanup could not process this image. Please try a different JPG, PNG, or WEBP file.');
+      setErrorMessage(copy.notices.freeFailed);
     } finally {
       setIsFreeProcessing(false);
     }
@@ -162,15 +171,15 @@ export function UploadPageFlow() {
     if (!file) return;
 
     if (status !== 'loading' && !user) {
-      startGoogleLogin('/matcha-filter-remover');
+      startGoogleLogin(localizePath('/matcha-filter-remover', locale));
       return;
     }
 
     if (status !== 'loading' && user && creditsBalance <= 0) {
-      setNoticeMessage('You do not have enough credits. Redirecting to Buy credits...');
+      setNoticeMessage(copy.errors.credits);
       setErrorMessage(null);
       window.setTimeout(() => {
-        window.location.assign('/pricing');
+        window.location.assign(localizePath('/pricing', locale));
       }, 1200);
       return;
     }
@@ -230,7 +239,7 @@ export function UploadPageFlow() {
         }
 
         if (errorResult.errorCode === 'UNAUTHORIZED') {
-          throw new Error('Please sign in with Google before restoring an image.');
+          throw new Error(copy.errors.signIn);
         }
 
         throw new Error(errorResult.errorMessage ?? 'job_failed');
@@ -239,7 +248,7 @@ export function UploadPageFlow() {
       const jobResult = await jobResponse.json();
       setJobId(jobResult.jobId);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Upload failed. Please try again.');
+      setErrorMessage(error instanceof Error ? error.message : copy.errors.upload);
     } finally {
       setIsSubmitting(false);
     }
@@ -249,10 +258,10 @@ export function UploadPageFlow() {
     <div id="upload" className="overflow-hidden rounded-[2.5rem] border border-white/70 bg-white/65 shadow-[0_30px_100px_rgba(31,82,44,0.16)] ring-1 ring-matcha-100/50 backdrop-blur-xl">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/70 bg-white/45 px-5 py-4 md:px-7">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">Free preview</p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-slate-950">Upload your photo</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">{copy.hero.headerEyebrow}</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{copy.hero.headerTitle}</h2>
         </div>
-        <span className="rounded-full border border-matcha-200 bg-white/75 px-4 py-2 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur">No subscription</span>
+        <span className="rounded-full border border-matcha-200 bg-white/75 px-4 py-2 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur">{copy.hero.noSubscription}</span>
       </div>
 
       <div className="p-4 md:p-6">
@@ -271,9 +280,9 @@ export function UploadPageFlow() {
                 <img className="max-h-[28rem] w-full rounded-[1.25rem] bg-slate-100 object-contain" src={localPreviewUrl} alt="Selected upload preview" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-matcha-700">Preview ready</p>
-                <p className="text-sm font-medium text-slate-700">{file?.name ?? 'Selected image'}</p>
-                <p className="text-xs leading-5 text-slate-500">Drop another JPG, PNG, or WEBP to replace it.</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-matcha-700">{copy.hero.previewReady}</p>
+                <p className="text-sm font-medium text-slate-700">{file?.name ?? copy.hero.selectedImage}</p>
+                <p className="text-xs leading-5 text-slate-500">{copy.hero.replaceHint}</p>
               </div>
             </div>
           ) : (
@@ -281,9 +290,9 @@ export function UploadPageFlow() {
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-2xl shadow-[0_18px_45px_rgba(31,82,44,0.12)] transition duration-300 group-hover:-translate-y-1">
                 ↑
               </div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">Step 1 · Upload</p>
-              <span className="block text-2xl font-semibold tracking-[-0.03em] text-slate-950">Choose or drop your photo</span>
-              <p className="text-sm leading-6 text-slate-500">Use a JPG, PNG, or WEBP image under 10MB. Works best on visible green or yellow tint, especially skin, food, and white backgrounds.</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-matcha-700">{copy.hero.stepUpload}</p>
+              <span className="block text-2xl font-semibold tracking-[-0.03em] text-slate-950">{copy.hero.chooseDrop}</span>
+              <p className="text-sm leading-6 text-slate-500">{copy.hero.uploadDescription}</p>
             </div>
           )}
         </label>
@@ -293,8 +302,8 @@ export function UploadPageFlow() {
             <section className="rounded-[2rem] border border-white/80 bg-white/75 p-4 shadow-[0_18px_55px_rgba(31,82,44,0.10)] backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-matcha-700">Free preview</p>
-                  <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-slate-950">Preview basic color cleanup</h3>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-matcha-700">{copy.hero.headerEyebrow}</p>
+                  <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-slate-950">{copy.hero.basicTitle}</h3>
                 </div>
                 <button
                   className="rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800 disabled:cursor-not-allowed disabled:bg-slate-300"
@@ -302,27 +311,27 @@ export function UploadPageFlow() {
                   onClick={applyFreeCleanup}
                   type="button"
                 >
-                  {isFreeProcessing ? 'Processing...' : freeResultUrl ? 'Refresh preview' : 'Run free preview'}
+                  {isFreeProcessing ? copy.hero.freeLoading : freeResultUrl ? copy.hero.refreshPreview : copy.hero.freeButton}
                 </button>
               </div>
 
               {freeResultUrl ? (
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <figure>
-                    <img className="max-h-72 w-full rounded-2xl bg-white object-contain shadow-inner" src={localPreviewUrl ?? undefined} alt="Original photo" />
-                    <figcaption className="mt-2 text-xs font-medium text-slate-500">Original</figcaption>
+                    <img className="max-h-72 w-full rounded-2xl bg-white object-contain shadow-inner" src={localPreviewUrl ?? undefined} alt={copy.result.originalAlt} />
+                    <figcaption className="mt-2 text-xs font-medium text-slate-500">{copy.hero.original}</figcaption>
                   </figure>
                   <figure>
-                    <img className="max-h-72 w-full rounded-2xl bg-white object-contain shadow-inner" src={freeResultUrl ?? undefined} alt="Free preview result" />
-                    <figcaption className="mt-2 text-xs font-medium text-slate-500">Free preview</figcaption>
+                    <img className="max-h-72 w-full rounded-2xl bg-white object-contain shadow-inner" src={freeResultUrl ?? undefined} alt={copy.hero.previewTitle} />
+                    <figcaption className="mt-2 text-xs font-medium text-slate-500">{copy.hero.headerEyebrow}</figcaption>
                   </figure>
                   <a className="inline-flex justify-center rounded-full bg-matcha-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,105,51,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800 md:col-span-2" download="matcha-free-cleanup.png" href={freeResultUrl}>
-                    Download free preview
+                    {copy.hero.downloadFree}
                   </a>
                 </div>
               ) : (
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  Run the free preview to see whether the cast is light enough to stop here or whether AI Restore is worth 1 credit.
+                  {copy.hero.freeHelp}
                 </p>
               )}
             </section>
@@ -334,23 +343,23 @@ export function UploadPageFlow() {
               <div className="relative flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-matcha-200">AI Restore</p>
-                  <h3 className="mt-1 text-xl font-semibold tracking-[-0.03em] text-white">Still looks too green?</h3>
+                  <h3 className="mt-1 text-xl font-semibold tracking-[-0.03em] text-white">{copy.hero.aiTitle}</h3>
                 </div>
                 <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white shadow-sm shadow-black/10 backdrop-blur">
-                  1 credit
+                  {copy.hero.oneCredit}
                 </span>
               </div>
 
               <p className="relative mt-3 text-sm leading-6 text-slate-300">
-                Use AI Restore when the free preview still leaves a strong cast or when you want a more natural-looking finish.
+                {copy.hero.aiDescription}
               </p>
 
-              {isSubmitting || job ? <AiProgressPanel job={job} isPolling={isPolling} isSubmitting={isSubmitting} progress={aiProgressPercent} restoreSummary={aiRestoreSummary} /> : null}
+              {isSubmitting || job ? <AiProgressPanel copy={copy} job={job} isPolling={isPolling} isSubmitting={isSubmitting} progress={aiProgressPercent} restoreSummary={aiRestoreSummary} /> : null}
 
               <div className="relative mt-5 grid gap-5">
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-white">Restore strength</p>
+                    <p className="text-sm font-medium text-white">{copy.options.restoreMode}</p>
                     <div className="mt-2 grid grid-cols-3 gap-2">
                       {(['light', 'natural', 'strong'] as RestoreMode[]).map((mode) => (
                         <button
@@ -366,7 +375,7 @@ export function UploadPageFlow() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-white">White balance</p>
+                    <p className="text-sm font-medium text-white">{copy.options.whiteBalance}</p>
                     <div className="mt-2 grid grid-cols-3 gap-2">
                       {(['soft', 'standard', 'strong'] as WhiteBalanceMode[]).map((mode) => (
                         <button
@@ -383,7 +392,7 @@ export function UploadPageFlow() {
 
                   <label className="flex items-center gap-3 text-sm font-medium text-white">
                     <input checked={skinTonePriority} onChange={(event) => setSkinTonePriority(event.target.checked)} type="checkbox" />
-                    Prioritize natural skin tones
+                    {copy.options.skinTone}
                   </label>
                 </div>
 
@@ -394,10 +403,10 @@ export function UploadPageFlow() {
                     onClick={handleSubmit}
                     type="button"
                   >
-                    {isAiRunning ? `AI Restore running · ${aiProgressPercent}%` : user ? 'Restore with AI' : 'Sign in to restore'}
+                    {isAiRunning ? interpolate(copy.hero.aiRunning, { progress: aiProgressPercent }) : user ? copy.hero.restoreWithAi : copy.hero.signInRestore}
                   </button>
-                  <Link className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10" href="/pricing">
-                    View credits
+                  <Link className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10" href={localizePath('/pricing', locale)}>
+                    {copy.hero.viewCredits}
                   </Link>
                 </div>
               </div>
@@ -406,48 +415,48 @@ export function UploadPageFlow() {
         ) : null}
         </div>
 
-        {job?.status === 'completed' && job.outputPreviewUrl ? <AiResultStudio job={job} originalUrl={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} /> : null}
+        {job?.status === 'completed' && job.outputPreviewUrl ? <AiResultStudio copy={copy} job={job} originalUrl={job.inputPreviewUrl ?? localPreviewUrl ?? undefined} /> : null}
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
-          <InfoCard title="Free preview vs AI Restore" text="Free preview is a quick browser pass; AI Restore gives the stronger paid pass." />
-          <InfoCard title="Best input" text="Use photos with visible green or yellow tint. Very dark, blurry, or heavily compressed files work less well." />
-          <InfoCard title="Credit model" text="There is no subscription. 1 credit creates 1 AI Restore." />
+          {copy.infoCards.map((card) => (
+            <InfoCard key={card.title} title={card.title} text={card.text} />
+          ))}
         </div>
 
         <canvas className="hidden" ref={canvasRef} />
       </div>
 
       <div className="border-t border-white/70 bg-white/45 px-5 py-4 text-sm text-slate-600 md:px-7">
-        {errorMessage ? <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-semibold text-red-700">{errorMessage === 'INSUFFICIENT_CREDITS' ? 'You need credits before restoring this image.' : errorMessage}</p> : null}
-        {!errorMessage && !job ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">Free preview stays in your browser. AI Restore uploads the selected image for processing.</p> : null}
+        {errorMessage ? <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-semibold text-red-700">{errorMessage === 'INSUFFICIENT_CREDITS' ? copy.hero.needCredits : errorMessage}</p> : null}
+        {!errorMessage && !job ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">{copy.hero.footerNote}</p> : null}
       </div>
     </div>
   );
 }
 
 // getJobStageLabel 将任务状态和进度转换为用户可理解的处理阶段。
-function getJobStageLabel({ isPolling, isSubmitting, job, progress }: { isPolling: boolean; isSubmitting: boolean; job: Job | null; progress: number }) {
-  if (isSubmitting && !job) return 'Creating job';
-  if (!job) return 'Ready to start';
-  if (job.status === 'created') return 'Queued';
-  if (job.status === 'queued') return 'Queued';
-  if (job.status === 'processing' && progress >= 90) return 'Finalizing';
-  if (job.status === 'processing') return isPolling ? 'Processing' : 'Checking result';
-  if (job.status === 'completed') return 'Result ready';
-  if (job.status === 'failed') return 'Failed';
-  if (job.status === 'expired') return 'Expired';
-  return 'Checking result';
+function getJobStageLabel({ copy, isPolling, isSubmitting, job, progress }: { copy: UploadFlowCopy; isPolling: boolean; isSubmitting: boolean; job: Job | null; progress: number }) {
+  if (isSubmitting && !job) return copy.stages.creating;
+  if (!job) return copy.stages.creating;
+  if (job.status === 'created') return copy.stages.queued;
+  if (job.status === 'queued') return copy.stages.queued;
+  if (job.status === 'processing' && progress >= 90) return copy.stages.checking;
+  if (job.status === 'processing') return isPolling ? copy.stages.processing : copy.stages.checking;
+  if (job.status === 'completed') return copy.progress.view;
+  if (job.status === 'failed') return copy.stages.failed;
+  if (job.status === 'expired') return copy.stages.failed;
+  return copy.stages.checking;
 }
 
 // getAiRestoreSummary 汇总用户选择的 AI Restore 参数，方便在进度卡中持续展示。
-function getAiRestoreSummary({ restoreMode, skinTonePriority, whiteBalanceMode }: { restoreMode: RestoreMode; skinTonePriority: boolean; whiteBalanceMode: WhiteBalanceMode }) {
-  return [restoreMode === 'light' ? 'Light restore' : restoreMode === 'strong' ? 'Strong restore' : 'Natural restore', whiteBalanceMode === 'soft' ? 'Soft white balance' : whiteBalanceMode === 'strong' ? 'Strong white balance' : 'Standard white balance', skinTonePriority ? 'Skin tone priority' : null].filter(Boolean).join(' · ');
+function getAiRestoreSummary({ copy, restoreMode, skinTonePriority, whiteBalanceMode }: { copy: UploadFlowCopy; restoreMode: RestoreMode; skinTonePriority: boolean; whiteBalanceMode: WhiteBalanceMode }) {
+  return [restoreMode === 'light' ? copy.options.light : restoreMode === 'strong' ? copy.options.strong : copy.options.natural, whiteBalanceMode === 'soft' ? copy.options.soft : whiteBalanceMode === 'strong' ? copy.options.strongWhite : copy.options.standard, skinTonePriority ? copy.options.skinTone : null].filter(Boolean).join(' · ');
 }
 
 // AiProgressPanel 在 AI Restore 面板内展示强视觉进度，避免用户错过底部状态。
-function AiProgressPanel({ isPolling, isSubmitting, job, progress, restoreSummary }: { isPolling: boolean; isSubmitting: boolean; job: Job | null; progress: number; restoreSummary: string }) {
+function AiProgressPanel({ copy, isPolling, isSubmitting, job, progress, restoreSummary }: { copy: UploadFlowCopy; isPolling: boolean; isSubmitting: boolean; job: Job | null; progress: number; restoreSummary: string }) {
   const safeProgress = Math.max(0, Math.min(100, progress));
-  const stageLabel = getJobStageLabel({ isPolling, isSubmitting, job, progress: safeProgress });
+  const stageLabel = getJobStageLabel({ copy, isPolling, isSubmitting, job, progress: safeProgress });
   const isTerminalError = job?.status === 'failed' || job?.status === 'expired';
   const panelTone = isTerminalError ? 'border-red-300/30 bg-red-950/25' : job?.status === 'completed' ? 'border-matcha-300/30 bg-matcha-300/10' : 'border-white/10 bg-white/10';
 
@@ -456,26 +465,26 @@ function AiProgressPanel({ isPolling, isSubmitting, job, progress, restoreSummar
       <div className="pointer-events-none absolute -right-8 top-2 h-20 w-20 rounded-full bg-cyan-300/20 blur-2xl" />
       <div className="relative flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-200">AI processing</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-200">{copy.progress.title}</p>
           <h4 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-white">{stageLabel}</h4>
-          <p className="mt-2 text-xs leading-5 text-slate-300">{isTerminalError ? job?.errorMessage ?? 'The AI Restore did not produce a result. You can retry with the same photo.' : restoreSummary}</p>
+          <p className="mt-2 text-xs leading-5 text-slate-300">{isTerminalError ? job?.errorMessage ?? copy.progress.description : restoreSummary}</p>
         </div>
         <div className="text-right">
           <p className="text-4xl font-semibold tracking-[-0.06em] text-white">{safeProgress}%</p>
-          <p className="mt-1 text-xs font-medium text-slate-400">{job?.jobId ? 'Job active' : 'Starting'}</p>
+          <p className="mt-1 text-xs font-medium text-slate-400">{job?.jobId ? copy.stages.processing : copy.stages.creating}</p>
         </div>
       </div>
       <div className="relative mt-4 h-3 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
         <div className="h-full rounded-full bg-gradient-to-r from-matcha-300 via-emerald-300 to-cyan-300 shadow-[0_0_24px_rgba(103,232,249,0.35)] transition-all duration-700" style={{ width: `${safeProgress}%` }} />
       </div>
       <div className="relative mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-        <span>{job?.status ? `Status: ${job.status}` : 'Creating upload and job records'}</span>
+        <span>{job?.status ? interpolate(copy.progress.status, { status: job.status }) : copy.progress.creating}</span>
         {job?.status === 'completed' && job.outputPreviewUrl ? (
           <a className="rounded-full bg-gradient-to-r from-matcha-300 via-emerald-300 to-cyan-300 px-4 py-2 font-semibold text-slate-950 shadow-[0_14px_35px_rgba(103,232,249,0.22)] transition hover:-translate-y-0.5 hover:brightness-105" href="#ai-result-studio">
-            View AI Result Studio ↓
+            {copy.progress.view}
           </a>
         ) : (
-          <span>{isPolling ? 'Checking result automatically' : 'Waiting for next step'}</span>
+          <span>{isPolling ? copy.progress.checking : copy.progress.waiting}</span>
         )}
       </div>
     </div>
@@ -483,36 +492,36 @@ function AiProgressPanel({ isPolling, isSubmitting, job, progress, restoreSummar
 }
 
 // AiResultStudio 在上传页直接展示完整 AI 结果，不强制用户跳转到结果页。
-function AiResultStudio({ job, originalUrl }: { job: Job; originalUrl?: string }) {
+function AiResultStudio({ copy, job, originalUrl }: { copy: UploadFlowCopy; job: Job; originalUrl?: string }) {
   return (
     <section className="mt-5 scroll-mt-8 overflow-hidden rounded-[2rem] border border-white/70 bg-white/75 p-5 shadow-[0_24px_80px_rgba(31,82,44,0.14)] backdrop-blur-xl md:p-6" id="ai-result-studio">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">AI Result Studio</p>
-          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">Your restored image is ready here.</h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Review the AI Restore output directly on this page. Natural result, not exact original.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700">{copy.result.eyebrow}</p>
+          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">{copy.result.title}</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{copy.result.description}</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <a className="inline-flex justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5 hover:bg-matcha-800" href={job.outputPreviewUrl} rel="noreferrer" target="_blank">
-            Open image in new tab
+            {copy.result.open}
           </a>
           <a className="inline-flex justify-center rounded-full bg-gradient-to-r from-matcha-500 via-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(34,197,94,0.22)] transition hover:-translate-y-0.5 hover:brightness-105" download="matcha-ai-restore.png" href={job.outputPreviewUrl}>
-            Download image
+            {copy.result.download}
           </a>
         </div>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[0.82fr_1.18fr]">
         <figure className="rounded-[1.5rem] border border-white/80 bg-white/70 p-3 shadow-inner">
-          {originalUrl ? <img className="max-h-[24rem] w-full rounded-[1.15rem] bg-slate-100 object-contain" src={originalUrl} alt="Original before AI restore" /> : <div className="flex h-72 items-center justify-center rounded-[1.15rem] bg-slate-100 text-sm text-slate-500">Original image not available</div>}
-          <figcaption className="mt-3 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Before</figcaption>
+          {originalUrl ? <img className="max-h-[24rem] w-full rounded-[1.15rem] bg-slate-100 object-contain" src={originalUrl} alt={copy.result.originalAlt} /> : <div className="flex h-72 items-center justify-center rounded-[1.15rem] bg-slate-100 text-sm text-slate-500">{copy.result.originalMissing}</div>}
+          <figcaption className="mt-3 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{copy.result.before}</figcaption>
         </figure>
         <figure className="relative overflow-hidden rounded-[1.5rem] border border-matcha-200/70 bg-slate-950 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.22)]">
           <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-matcha-300/20 blur-3xl" />
-          <img className="relative max-h-[34rem] w-full rounded-[1.15rem] bg-slate-900 object-contain" src={job.outputPreviewUrl} alt="AI restored full result" />
+          <img className="relative max-h-[34rem] w-full rounded-[1.15rem] bg-slate-900 object-contain" src={job.outputPreviewUrl} alt={copy.result.resultAlt} />
           <figcaption className="relative mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-matcha-200">
-            <span>After · AI restored</span>
-            <span>{job.progress}% complete</span>
+            <span>{copy.result.after}</span>
+            <span>{interpolate(copy.result.complete, { progress: job.progress })}</span>
           </figcaption>
         </figure>
       </div>

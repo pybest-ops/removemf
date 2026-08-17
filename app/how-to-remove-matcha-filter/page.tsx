@@ -1,35 +1,17 @@
 import Link from 'next/link';
+import { localizePath } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { createI18nMetadata } from '@/lib/i18n/metadata';
+import { getRequestLocale } from '@/lib/i18n/server';
 import type { Metadata } from 'next';
 
 // metadata 覆盖 how-to 查询意图，帮助搜索用户理解工具能力边界。
-export const metadata: Metadata = {
-  title: 'How to Remove Matcha Filter from a Photo Online',
-  description: 'Learn how to remove a matcha filter from a saved photo online. Reduce green tint, yellow cast, and muted colors with preview and AI Restore.',
-  alternates: {
-    canonical: '/how-to-remove-matcha-filter'
-  },
-  openGraph: {
-    title: 'How to Remove Matcha Filter from a Photo Online',
-    description: 'Learn how to remove a matcha filter from a saved photo online. Reduce green tint, yellow cast, and muted colors with preview and AI Restore.',
-    url: '/how-to-remove-matcha-filter',
-    siteName: 'Remove Matcha Filter',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Remove Matcha Filter before and after preview'
-      }
-    ],
-    type: 'website'
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'How to Remove Matcha Filter from a Photo Online',
-    description: 'Learn how to remove a matcha filter from a saved photo online. Reduce green tint, yellow cast, and muted colors with preview and AI Restore.',
-    images: ['/og-image.png']
-  }
-};
+export function generateMetadata(): Metadata {
+  const locale = getRequestLocale();
+  const dictionary = getDictionary(locale);
+
+  return createI18nMetadata(locale, '/how-to-remove-matcha-filter', dictionary.metadata.howTo);
+}
 
 // steps 解释从上传到 AI 修复的最短使用路径。
 const steps = [
@@ -88,6 +70,8 @@ const limits = [
 
 // HowToRemoveMatchaFilterPage 承接 how-to 搜索并引导用户上传图片。
 export default function HowToRemoveMatchaFilterPage() {
+  const locale = getRequestLocale();
+
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-6 py-10">
       <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-black/5">
@@ -99,10 +83,10 @@ export default function HowToRemoveMatchaFilterPage() {
           If a photo looks too green, yellow, muted, or cloudy after a social filter, start with a simple cleanup path. Upload the saved image, process free in browser, then use AI Restore only when the tint still needs a stronger correction.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/matcha-filter-remover">
+          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href={localizePath('/matcha-filter-remover', locale)}>
             Upload a photo
           </Link>
-          <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href="/pricing">
+          <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href={localizePath('/pricing', locale)}>
             View credits
           </Link>
         </div>

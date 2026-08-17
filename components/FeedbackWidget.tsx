@@ -2,8 +2,10 @@
 
 import { AppMessage } from '@/components/AppMessage';
 import type { AppMessageNotice } from '@/components/AppMessage';
+import { stripLocaleFromPathname } from '@/lib/i18n/config';
 import { usePathname } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useI18n } from './i18n/I18nProvider';
 
 type FeedbackType = 'idea' | 'bug' | 'praise' | 'other';
 
@@ -11,14 +13,6 @@ type FeedbackResponse = {
   errorMessage?: string;
   ok?: boolean;
 };
-
-// feedbackTypes 定义弹窗中可选的反馈业务类型。
-const feedbackTypes: Array<{ icon: string; label: string; value: FeedbackType }> = [
-  { icon: '💡', label: 'Idea', value: 'idea' },
-  { icon: '🐛', label: 'Bug', value: 'bug' },
-  { icon: '💚', label: 'Praise', value: 'praise' },
-  { icon: '💬', label: 'Other', value: 'other' }
-];
 
 // visiblePaths 控制反馈入口只出现在核心转化页面。
 const visiblePaths = new Set(['/', '/matcha-filter-remover', '/pricing']);
@@ -28,7 +22,16 @@ const maxMessageLength = 2000;
 
 // FeedbackWidget 提供全站核心页面的悬浮反馈入口和提交弹窗。
 export function FeedbackWidget() {
+  const { dictionary } = useI18n();
+  const copy = dictionary.feedback;
   const pathname = usePathname();
+  // feedbackTypes 定义弹窗中可选的反馈业务类型。
+  const feedbackTypes: Array<{ icon: string; label: string; value: FeedbackType }> = [
+    { icon: '💡', label: copy.types.idea, value: 'idea' },
+    { icon: '🐛', label: copy.types.bug, value: 'bug' },
+    { icon: '💚', label: copy.types.praise, value: 'praise' },
+    { icon: '💬', label: copy.types.other, value: 'other' }
+  ];
   const [isOpen, setIsOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('idea');
   const [message, setMessage] = useState('');
@@ -36,7 +39,7 @@ export function FeedbackWidget() {
   // notice 保存当前反馈提交触发的页面级轻提示。
   const [notice, setNotice] = useState<AppMessageNotice | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isVisible = useMemo(() => visiblePaths.has(pathname), [pathname]);
+  const isVisible = useMemo(() => visiblePaths.has(stripLocaleFromPathname(pathname)), [pathname]);
   const remainingCharacters = maxMessageLength - message.length;
 
   // handleMessageClose 关闭顶部轻提示，供自动关闭和手动关闭复用。
@@ -107,9 +110,9 @@ export function FeedbackWidget() {
       setMessage('');
       setContact('');
       setFeedbackType('idea');
-      setNotice({ type: 'success', text: 'Thanks — your feedback was sent.' });
+      setNotice({ type: 'success', text: copy.success });
     } catch (error) {
-      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to send feedback right now.' });
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : copy.error });
     } finally {
       setIsSubmitting(false);
     }
@@ -128,29 +131,29 @@ export function FeedbackWidget() {
         <svg className="feedback-fab-icon h-7 w-7 md:h-4 md:w-4" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
         </svg>
-        <span className="hidden md:inline">Feedback</span>
+        <span className="hidden md:inline">{copy.button}</span>
       </button>
 
       {isOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-5 py-4 backdrop-blur-sm sm:p-6" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
-          <button className="absolute inset-0 cursor-default" onClick={handleClose} type="button" aria-label="Close feedback dialog" />
+          <button className="absolute inset-0 cursor-default" onClick={handleClose} type="button" aria-label={copy.close} />
           <form className="relative w-full max-w-[30rem] overflow-hidden rounded-[1.5rem] border border-white/80 bg-[#f7faf7]/95 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.24)] backdrop-blur-xl md:rounded-[1.75rem] md:p-5" onSubmit={handleSubmit}>
             <div className="pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-matcha-200/70 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 -left-14 h-44 w-44 rounded-full bg-cyan-100/70 blur-3xl" />
             <div className="relative">
               <div className="flex items-start justify-between gap-5">
                 <div>
-                  <p className="w-fit rounded-full border border-matcha-200 bg-white/70 px-3 py-1 text-[0.64rem] font-bold uppercase tracking-[0.18em] text-matcha-800 shadow-sm">Matcha feedback</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-slate-950 md:text-3xl" id="feedback-title">Send feedback</h2>
-                  <p className="mt-1.5 max-w-xl text-xs leading-5 text-slate-600 md:text-sm">Bugs, ideas, praise, or a quick note.</p>
+                  <p className="w-fit rounded-full border border-matcha-200 bg-white/70 px-3 py-1 text-[0.64rem] font-bold uppercase tracking-[0.18em] text-matcha-800 shadow-sm">{copy.eyebrow}</p>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-slate-950 md:text-3xl" id="feedback-title">{copy.title}</h2>
+                  <p className="mt-1.5 max-w-xl text-xs leading-5 text-slate-600 md:text-sm">{copy.description}</p>
                 </div>
-                <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-matcha-200 bg-white/80 text-xl leading-none text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-matcha-300/35" onClick={handleClose} type="button" aria-label="Close feedback dialog">
+                <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-matcha-200 bg-white/80 text-xl leading-none text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-matcha-300/35" onClick={handleClose} type="button" aria-label={copy.close}>
                   ×
                 </button>
               </div>
 
               <fieldset className="mt-4">
-                <legend className="text-xs font-bold uppercase tracking-[0.22em] text-slate-800">Feedback type</legend>
+                <legend className="text-xs font-bold uppercase tracking-[0.22em] text-slate-800">{copy.type}</legend>
                 <div className="mt-2 grid grid-cols-4 gap-2">
                   {feedbackTypes.map((item) => {
                     const isSelected = feedbackType === item.value;
@@ -171,25 +174,25 @@ export function FeedbackWidget() {
               </fieldset>
 
               <label className="mt-4 block" htmlFor="feedback-message">
-                <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-800">Your message</span>
+                <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-800">{copy.message}</span>
                 <textarea
                   className="mt-2 min-h-20 w-full resize-y rounded-[1.1rem] border border-matcha-200 bg-white/80 px-3.5 py-2.5 text-sm text-slate-950 shadow-inner outline-none transition placeholder:text-slate-400 focus:border-matcha-400 focus:ring-4 focus:ring-matcha-300/25 md:min-h-24 md:text-base"
                   id="feedback-message"
                   maxLength={maxMessageLength}
                   onChange={(event) => setMessage(event.target.value)}
-                  placeholder="What worked, what did not, what you wish existed..."
+                  placeholder={copy.placeholder}
                   value={message}
                 />
               </label>
               <p className={`mt-1.5 text-right text-xs font-semibold ${remainingCharacters < 0 ? 'text-red-600' : 'text-slate-400'}`}>{message.length}/{maxMessageLength}</p>
 
               <label className="mt-3 block" htmlFor="feedback-contact">
-                <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-800">Email or handle <span className="normal-case tracking-normal text-slate-500">optional</span></span>
+                <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-800">{copy.contact} <span className="normal-case tracking-normal text-slate-500">{copy.optional}</span></span>
                 <input
                   className="mt-2 w-full rounded-full border border-matcha-200 bg-white/80 px-3.5 py-2 text-sm text-slate-950 shadow-inner outline-none transition placeholder:text-slate-400 focus:border-matcha-400 focus:ring-4 focus:ring-matcha-300/25 md:text-base"
                   id="feedback-contact"
                   onChange={(event) => setContact(event.target.value)}
-                  placeholder="So we can reply if needed"
+                  placeholder={copy.contactPlaceholder}
                   type="text"
                   value={contact}
                 />
@@ -200,9 +203,9 @@ export function FeedbackWidget() {
                 disabled={isSubmitting || !message.trim()}
                 type="submit"
               >
-                {isSubmitting ? 'Sending...' : 'Send feedback'}
+                {isSubmitting ? copy.sending : copy.submit}
               </button>
-              <p className="mt-2.5 text-center text-[0.68rem] leading-4 text-slate-500 md:text-xs md:leading-5">Anonymous unless you add contact details. The current page is saved with your message.</p>
+              <p className="mt-2.5 text-center text-[0.68rem] leading-4 text-slate-500 md:text-xs md:leading-5">{copy.note}</p>
             </div>
           </form>
         </div>

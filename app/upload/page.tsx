@@ -1,24 +1,25 @@
 import { Footer } from '@/components/Footer';
 import { UploadPageFlow } from '@/components/UploadPageFlow';
+import { localizePath } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { createI18nMetadata } from '@/lib/i18n/metadata';
+import { getRequestLocale } from '@/lib/i18n/server';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
 // metadata 声明上传页的规范地址，避免入口页面被识别为重复内容。
-export const metadata: Metadata = {
-  alternates: {
-    canonical: '/matcha-filter-remover'
-  }
-};
+export function generateMetadata(): Metadata {
+  const locale = getRequestLocale();
+  const dictionary = getDictionary(locale);
 
-// guidanceSteps 说明上传页从免费预览到 AI Restore 的完整工作流。
-const guidanceSteps = [
-  { title: 'Upload', text: 'Drop one photo with a visible matcha-style green or yellow cast.' },
-  { title: 'Preview', text: 'Run the free preview before spending a credit.' },
-  { title: 'Restore', text: 'Use AI Restore when the image still needs stronger cast reduction.' }
-];
+  return createI18nMetadata(locale, '/matcha-filter-remover', dictionary.metadata.upload);
+}
 
 // UploadPage 展示图片清理工作流的页面级布局。
 export default function UploadPage() {
+  const locale = getRequestLocale();
+  const dictionary = getDictionary(locale).upload;
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-6 py-8">
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-matcha-200/45 blur-3xl animate-glow-drift" />
@@ -26,11 +27,11 @@ export default function UploadPage() {
       <div className="pointer-events-none absolute bottom-20 left-[-10rem] -z-10 h-[26rem] w-[26rem] rounded-full bg-emerald-200/45 blur-3xl" />
 
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
-        <div className="flex items-center justify-between gap-4">
-          <Link className="rounded-full border border-matcha-200 bg-white/70 px-4 py-2 text-sm font-semibold text-matcha-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white" href="/">
-            Back to home
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <Link className="rounded-full border border-matcha-200 bg-white/70 px-4 py-2 text-sm font-semibold text-matcha-800 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white" href={localizePath('/', locale)}>
+            {dictionary.top.back}
           </Link>
-          <p className="rounded-full border border-white/80 bg-white/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700 shadow-sm backdrop-blur">Matcha filter remover</p>
+          <p className="rounded-full border border-white/80 bg-white/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-matcha-700 shadow-sm backdrop-blur">{dictionary.top.badge}</p>
         </div>
 
         <div>
@@ -55,29 +56,29 @@ export default function UploadPage() {
 
           <section className="relative grid gap-6 rounded-[2.5rem] border border-white/70 bg-white/65 p-6 shadow-[0_30px_100px_rgba(31,82,44,0.16)] backdrop-blur-xl md:p-8 lg:grid-cols-[0.95fr_1.05fr] lg:p-10">
             <div className="flex flex-col justify-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-matcha-700">Photo cleanup workflow</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-matcha-700">{dictionary.intro.eyebrow}</p>
               <h1 className="mt-4 max-w-xl text-4xl font-semibold leading-[1.04] tracking-[-0.045em] text-slate-950 md:text-5xl">
-                Upload, preview, then restore.
+                {dictionary.intro.title}
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-                Start with a free preview. If the photo still has a green or yellow cast, use AI Restore with 1 credit for a stronger natural result.
+                {dictionary.intro.description}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
-                <span className="rounded-full border border-matcha-200 bg-white/70 px-3 py-1.5 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur">Free preview first</span>
-                <span className="rounded-full border border-matcha-200 bg-white/70 px-3 py-1.5 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur">1 credit for AI Restore</span>
-                <span className="rounded-full border border-matcha-200 bg-white/70 px-3 py-1.5 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur">Natural result, not exact original</span>
+                {dictionary.intro.pills.map((pill) => (
+                  <span className="rounded-full border border-matcha-200 bg-white/70 px-3 py-1.5 text-xs font-semibold text-matcha-800 shadow-sm backdrop-blur" key={pill}>{pill}</span>
+                ))}
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-              {guidanceSteps.map((step, index) => (
+              {dictionary.guidanceSteps.map((step, index) => (
                 <InfoPill key={step.title} title={`Step ${index + 1} · ${step.title}`} text={step.text} />
               ))}
             </div>
           </section>
         </div>
 
-        <p className="text-center text-sm text-slate-500">JPG, PNG, WEBP · Free preview · AI Restore is 1 credit per photo · Natural result, not exact original</p>
+        <p className="text-center text-sm text-slate-500">{dictionary.intro.footer}</p>
         <Footer />
       </div>
     </main>

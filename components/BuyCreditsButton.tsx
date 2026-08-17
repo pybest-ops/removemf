@@ -1,11 +1,14 @@
 'use client';
 
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { localizePath } from '@/lib/i18n/config';
+import { useI18n } from './i18n/I18nProvider';
 import { useState } from 'react';
 import type { CreditPack } from '@/lib/pricing';
 
 // BuyCreditsButton 负责登录校验、创建 PayPal 订单并跳转 approval 页面。
 export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
+  const { dictionary, locale } = useI18n();
   const { status, user } = useCurrentUser();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -17,7 +20,7 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
     if (status === 'loading') return;
 
     if (!user) {
-      startGoogleLogin('/pricing');
+      startGoogleLogin(localizePath('/pricing', locale));
       return;
     }
 
@@ -32,11 +35,11 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
 
       const result = await response.json();
 
-      if (!response.ok) throw new Error(result.errorMessage ?? 'Unable to create checkout.');
+      if (!response.ok) throw new Error(result.errorMessage ?? dictionary.pricing.buyButton.checkoutError);
 
       window.location.href = result.approvalUrl;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to start checkout.';
+      const message = error instanceof Error ? error.message : dictionary.pricing.buyButton.startError;
       setErrorMessage(message);
       setIsLoading(false);
     }
@@ -50,7 +53,7 @@ export function BuyCreditsButton({ packId }: { packId: CreditPack['id'] }) {
         onClick={handleBuy}
         type="button"
       >
-        {isLoading ? 'Opening PayPal...' : user ? 'Buy credits' : 'Sign in to buy'}
+        {isLoading ? dictionary.pricing.buyButton.loading : user ? dictionary.pricing.buyButton.buy : dictionary.pricing.buyButton.signIn}
       </button>
       {errorMessage ? <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{errorMessage}</p> : null}
     </div>

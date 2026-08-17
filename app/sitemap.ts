@@ -1,14 +1,12 @@
 import type { MetadataRoute } from 'next';
-
-// siteUrl 是生产环境公开域名，用于生成 sitemap 中的绝对 URL。
-const siteUrl = 'https://removematchafilter.org';
+import { locales, localizePath, siteUrl } from '@/lib/i18n/config';
 
 // sitemapRoutes 定义允许搜索引擎收录的公开静态页面。
 const sitemapRoutes = ['/', '/pricing', '/faq', '/privacy', '/terms', '/refund', '/matcha-filter-remover', '/blog', '/what-is-matcha-filter', '/how-to-remove-matcha-filter'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return sitemapRoutes.map((route) => ({
-    url: new URL(route, siteUrl).toString(),
+  return sitemapRoutes.flatMap((route) => locales.map((locale) => ({
+    url: new URL(localizePath(route, locale), siteUrl).toString(),
     lastModified: new Date()
-  }));
+  })));
 }

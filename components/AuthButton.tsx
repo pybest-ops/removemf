@@ -1,32 +1,36 @@
 'use client';
 
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useI18n } from './i18n/I18nProvider';
 
 // AuthButton 展示当前 Google 登录状态，并提供登录或退出入口。
 export function AuthButton() {
+  const { dictionary } = useI18n();
   const { status, user } = useCurrentUser();
   const userName = user?.name ?? user?.email;
 
   if (status === 'loading') {
-    return <span className="text-sm font-medium text-slate-500">Checking login...</span>;
+    return <span className="text-sm font-medium text-slate-500">{dictionary.common.auth.checking}</span>;
   }
 
   if (user) {
     return (
       <button
-        className="rounded-full border border-matcha-200 px-5 py-2.5 text-sm font-semibold text-matcha-800 transition hover:bg-matcha-50"
+        className="h-11 rounded-full border border-matcha-200 px-3 text-sm font-semibold text-matcha-800 transition hover:bg-matcha-50 sm:px-5"
         onClick={handleLogout}
         type="button"
       >
-        {userName ? `Sign out · ${userName}` : 'Sign out'}
+        <span className="sm:hidden">{dictionary.common.auth.signOut}</span>
+        <span className="hidden sm:inline">{userName ? dictionary.common.auth.signOutWithName.replace('{name}', userName) : dictionary.common.auth.signOut}</span>
       </button>
     );
   }
 
   return (
     <button
-      className="inline-flex items-center gap-2 rounded-full border border-matcha-200 px-5 py-2.5 text-sm font-semibold text-matcha-800 transition hover:bg-matcha-50"
-      onClick={() => startGoogleLogin('/')}
+      aria-label={dictionary.common.auth.signIn}
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-matcha-200 text-sm font-semibold text-matcha-800 transition hover:bg-matcha-50 sm:w-auto sm:gap-2 sm:px-5"
+      onClick={() => startGoogleLogin(`${window.location.pathname}${window.location.search}` || '/')}
       type="button"
     >
       <svg className="h-4 w-4" viewBox="0 0 1024 1024" aria-hidden="true">
@@ -35,7 +39,7 @@ export function AuthButton() {
         <path d="M516.693333 807.808c-134.357333 0-247.509333-84.864-287.232-202.88l-172.288 128.853333c83.242667 165.546667 257.152 278.826667 459.52 278.826667 124.842667 0 244.053333-43.392 333.568-124.757333l-163.584-123.818667c-46.122667 28.458667-104.234667 43.776-170.026666 43.776" fill="#34A853"></path>
         <path d="M1005.397333 512c0-29.568-4.693333-61.44-11.648-91.008H516.650667V614.4h274.602666c-13.696 65.962667-51.072 116.650667-104.533333 149.632l163.541333 123.818667c93.994667-85.418667 155.136-212.650667 155.136-375.850667" fill="#4285F4"></path>
       </svg>
-      Sign In
+      <span className="hidden sm:inline">{dictionary.common.auth.signIn}</span>
     </button>
   );
 }

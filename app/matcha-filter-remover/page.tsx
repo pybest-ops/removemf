@@ -1,1 +1,1 @@
-export { default, metadata } from '../upload/page';
+export { default, generateMetadata } from '../upload/page';

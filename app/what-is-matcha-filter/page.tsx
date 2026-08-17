@@ -1,35 +1,17 @@
 import Link from 'next/link';
+import { localizePath } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { createI18nMetadata } from '@/lib/i18n/metadata';
+import { getRequestLocale } from '@/lib/i18n/server';
 import type { Metadata } from 'next';
 
 // metadata 承接 definition 查询，并澄清 matcha filter 在本站中的图片含义。
-export const metadata: Metadata = {
-  title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained',
-  description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.',
-  alternates: {
-    canonical: '/what-is-matcha-filter'
-  },
-  openGraph: {
-    title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained',
-    description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.',
-    url: '/what-is-matcha-filter',
-    siteName: 'Remove Matcha Filter',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Remove Matcha Filter before and after preview'
-      }
-    ],
-    type: 'website'
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained',
-    description: 'A matcha filter is a greenish or yellowish photo look that can affect skin, whites, and backgrounds. Learn what it means and how to reduce it online.',
-    images: ['/og-image.png']
-  }
-};
+export function generateMetadata(): Metadata {
+  const locale = getRequestLocale();
+  const dictionary = getDictionary(locale);
+
+  return createI18nMetadata(locale, '/what-is-matcha-filter', dictionary.metadata.whatIs);
+}
 
 // symptoms 描述用户能直接识别的抹茶滤镜表现。
 const symptoms = [
@@ -83,6 +65,8 @@ const restoreCases = [
 
 // WhatIsMatchaFilterPage 解释关键词含义，并把信息型用户导向修复工具。
 export default function WhatIsMatchaFilterPage() {
+  const locale = getRequestLocale();
+
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-6 py-10">
       <section className="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-black/5">
@@ -94,10 +78,10 @@ export default function WhatIsMatchaFilterPage() {
           A matcha filter is a green or yellow color cast that makes a photo feel soft, muted, or slightly cloudy. It can be a deliberate style, but it becomes annoying when you only have the saved filtered photo and want the image to look normal again.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href="/matcha-filter-remover">
+          <Link className="rounded-full bg-matcha-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-matcha-700/20" href={localizePath('/matcha-filter-remover', locale)}>
             Remove matcha filter
           </Link>
-          <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href="/how-to-remove-matcha-filter">
+          <Link className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700" href={localizePath('/how-to-remove-matcha-filter', locale)}>
             How it works
           </Link>
         </div>
