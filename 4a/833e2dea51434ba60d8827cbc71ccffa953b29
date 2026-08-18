@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "4a833e2dea51434ba60d8827cbc71ccffa953b29",
+  "prompts": {},
+  "humans": {
+    "h_4b5baf569fa24a": {
+      "author": "muyun <muyun@tsign.cn>"
+    }
+  }
+}
