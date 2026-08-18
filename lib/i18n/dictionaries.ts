@@ -38,7 +38,11 @@ const englishDictionary = {
       privacy: 'Privacy',
       terms: 'Terms',
       refund: 'Refund',
-      contact: 'Contact:'
+      contact: 'Contact:',
+      tools: 'Tools',
+      legal: 'Legal',
+      tiktok: 'TikTok Remove Matcha Filter',
+      youtube: 'YouTube Remove Matcha Filter'
     }
   },
   metadata: {
@@ -69,6 +73,14 @@ const englishDictionary = {
     howTo: {
       title: 'How to Remove Matcha Filter from a Photo Online',
       description: 'Follow a simple workflow to remove matcha filter from photo online: upload, preview free cleanup, then use AI Restore if needed.'
+    },
+    tiktok: {
+      title: 'TikTok Remove Matcha Filter – Clean TikTok Photos Online',
+      description: 'Remove matcha filter from TikTok screenshots and saved photos. Free browser preview, then AI Restore for natural results.'
+    },
+    youtube: {
+      title: 'YouTube Remove Matcha Filter – Clean YouTube Thumbnails & Screenshots',
+      description: 'Remove matcha filter from YouTube thumbnails, screenshots, and saved photos. Free browser preview, then AI Restore for natural results.'
     },
     privacy: {
       title: 'Privacy Policy | Remove Matcha Filter',
@@ -345,8 +357,104 @@ const englishDictionary = {
     pathText: 'Process free in browser first, then spend 1 credit on AI Restore only when basic cleanup is not enough.',
     posts: [
       { href: '/what-is-matcha-filter', label: 'Definition guide', title: 'What Is a Matcha Filter? Green Tint Photo Filter Explained', description: 'Learn what a matcha-style filter means for photos, how it affects skin tones and whites, and when cleanup can help.', cta: 'Read the explanation' },
-      { href: '/how-to-remove-matcha-filter', label: 'How-to guide', title: 'How to Remove Matcha Filter from a Photo Online', description: 'Follow the shortest path: upload a saved photo, process free in browser, then use AI Restore if the tint needs stronger correction.', cta: 'Read the steps' }
+      { href: '/how-to-remove-matcha-filter', label: 'How-to guide', title: 'How to Remove Matcha Filter from a Photo Online', description: 'Follow the shortest path: upload a saved photo, process free in browser, then use AI Restore if the tint needs stronger correction.', cta: 'Read the steps' },
+      { href: '/tiktok-remove-matcha-filter', label: 'TikTok tool', title: 'TikTok Remove Matcha Filter – Clean TikTok Photos Online', description: 'Remove matcha filter from TikTok screenshots and saved photos. Free browser preview, then AI Restore for natural results.', cta: 'Try the tool' },
+      { href: '/youtube-remove-matcha-filter', label: 'YouTube tool', title: 'YouTube Remove Matcha Filter – Clean YouTube Thumbnails and Screenshots', description: 'Remove matcha filter from YouTube thumbnails, screenshots, and saved photos. Free browser preview, then AI Restore for natural results.', cta: 'Try the tool' }
     ]
+  },
+  tiktok: {
+    eyebrow: 'TikTok matcha filter remover',
+    title: 'Remove Matcha Filter from TikTok Photos',
+    description: 'Saved a TikTok screenshot or photo that looks too green, yellow, or muted? Upload it here to reduce the matcha-style color cast and get a more natural-looking result.',
+    cta: 'Upload a TikTok photo',
+    secondaryCta: 'How it works',
+    whatIs: {
+      eyebrow: 'About TikTok matcha filter',
+      title: 'What is a TikTok matcha filter?',
+      paragraphs: [
+        'On TikTok, a matcha filter refers to a popular editing style that pushes photos and video frames toward soft green, yellow, olive, or muted beige tones. Creators use it to give portraits, food clips, travel vlogs, and lifestyle content a calm, cinematic, or vintage feel.',
+        'The problem starts when you save a screenshot or photo from TikTok and no longer have the original. The green or yellow cast looks stylish in a feed but strange when you want a clean profile picture, product shot, or family photo.',
+        'This tool helps reduce that color cast. Upload the saved image, preview a free browser cleanup, then use AI Restore if the tint needs stronger correction.'
+      ]
+    },
+    imageGuide: {
+      eyebrow: 'Best image size',
+      title: 'Upload the best quality TikTok screenshot',
+      description: 'TikTok content is vertical. For the best cleanup result, upload the highest-resolution screenshot or saved photo you have.',
+      specs: [
+        { label: 'TikTok video screenshot', value: '1080 × 1920 (9:16)' },
+        { label: 'TikTok profile photo', value: '200 × 200 (1:1)' },
+        { label: 'Max upload size', value: '10 MB (JPG, PNG, WEBP)' }
+      ]
+    },
+    examples: {
+      eyebrow: 'Common use cases',
+      title: 'When to use TikTok matcha filter remover',
+      items: [
+        { title: 'Saved TikTok screenshots', text: 'A screenshot from a TikTok video that looks too green or yellow. Upload it to reduce the cast before sharing elsewhere.' },
+        { title: 'TikTok profile pictures', text: 'Your TikTok profile photo has a matcha-style tint but you want a cleaner version for LinkedIn, Instagram, or a resume.' },
+        { title: 'Product photos from TikTok', text: 'A product clip looks great in the TikTok feed but the saved image has a color cast that makes whites and skin look off.' },
+        { title: 'Travel and food clips', text: 'A travel or food TikTok looks cinematic with the filter, but the saved photo feels too muted for your camera roll or blog.' }
+      ]
+    },
+    faq: {
+      eyebrow: 'TikTok FAQ',
+      title: 'Frequently asked questions about TikTok matcha filter removal',
+      items: [
+        { question: 'Can I remove matcha filter from a TikTok video screenshot?', answer: 'Yes. Take a screenshot of the TikTok video or save the photo, then upload it here. The free browser preview reduces light color casts. Use AI Restore for stronger correction.' },
+        { question: 'What is the best image size to upload from TikTok?', answer: 'TikTok uses 1080 × 1920 (9:16) for vertical content. Upload the highest-resolution version you have. Avoid screenshots of screenshots, as compression reduces the cleanup quality.' },
+        { question: 'Does it work on TikTok beauty filters too?', answer: 'This tool focuses on color cast reduction — green tint, yellow cast, and muted tones. It is not designed to remove beauty reshaping, AR face changes, stickers, or text overlays.' },
+        { question: 'Is the free preview really free?', answer: 'Yes. The browser preview does not upload your photo and does not use credits. AI Restore uses 1 credit per photo only when you need stronger correction.' },
+        { question: 'Can I use the cleaned photo on other platforms?', answer: 'Yes. Once you download the result, you can use it anywhere — Instagram, LinkedIn, your website, or print. Only upload photos you own or have permission to edit.' }
+      ]
+    }
+  },
+  youtube: {
+    eyebrow: 'YouTube matcha filter remover',
+    title: 'Remove Matcha Filter from YouTube Photos',
+    description: 'Saved a YouTube thumbnail, screenshot, or photo that looks too green, yellow, or muted? Upload it here to reduce the matcha-style color cast and get a more natural-looking result.',
+    cta: 'Upload a YouTube photo',
+    secondaryCta: 'How it works',
+    whatIs: {
+      eyebrow: 'About YouTube matcha filter',
+      title: 'What is a YouTube matcha filter?',
+      paragraphs: [
+        'On YouTube, a matcha filter refers to a color grading style that pushes thumbnails, video frames, and channel art toward soft green, yellow, olive, or muted beige tones. Creators use it to give vlogs, tutorials, lifestyle content, and talking-head videos a warmer, more cinematic look.',
+        'The problem starts when you save a thumbnail, screenshot, or frame from a YouTube video. The matcha-style color cast looks intentional in a video but strange when you need a clean image for a presentation, blog post, or social profile.',
+        'This tool helps reduce that color cast. Upload the saved image, preview a free browser cleanup, then use AI Restore if the tint needs stronger correction.'
+      ]
+    },
+    imageGuide: {
+      eyebrow: 'Best image size',
+      title: 'Upload the best quality YouTube image',
+      description: 'YouTube content is mostly horizontal. For the best cleanup result, upload the highest-resolution thumbnail or screenshot you have.',
+      specs: [
+        { label: 'YouTube thumbnail', value: '1280 × 720 (16:9)' },
+        { label: 'YouTube video screenshot', value: '1920 × 1080 (16:9)' },
+        { label: 'Max upload size', value: '10 MB (JPG, PNG, WEBP)' }
+      ]
+    },
+    examples: {
+      eyebrow: 'Common use cases',
+      title: 'When to use YouTube matcha filter remover',
+      items: [
+        { title: 'YouTube thumbnails', text: 'A YouTube thumbnail has a matcha-style tint but you want a cleaner version for repurposing or a different platform.' },
+        { title: 'Video screenshots', text: 'A screenshot from a YouTube video looks too green or yellow. Upload it to reduce the cast before using it in a presentation or article.' },
+        { title: 'Channel banner art', text: 'Your channel banner or profile image has a color cast that looks off when viewed outside YouTube.' },
+        { title: 'Educational content frames', text: 'A tutorial or educational video frame has a warm tint that makes text, diagrams, or skin tones look unnatural when saved.' }
+      ]
+    },
+    faq: {
+      eyebrow: 'YouTube FAQ',
+      title: 'Frequently asked questions about YouTube matcha filter removal',
+      items: [
+        { question: 'Can I remove matcha filter from a YouTube thumbnail?', answer: 'Yes. Save or screenshot the thumbnail, then upload it here. The free browser preview reduces light color casts. Use AI Restore for stronger correction.' },
+        { question: 'What is the best image size to upload from YouTube?', answer: 'YouTube thumbnails are 1280 × 720 (16:9). Video screenshots can be up to 1920 × 1080. Upload the highest-resolution version you have for the best cleanup result.' },
+        { question: 'Does it work on YouTube video frames too?', answer: 'Yes. Any saved image with a green, yellow, or matcha-style color cast can be processed. This includes video screenshots, thumbnails, and channel art.' },
+        { question: 'Is the free preview really free?', answer: 'Yes. The browser preview does not upload your photo and does not use credits. AI Restore uses 1 credit per photo only when you need stronger correction.' },
+        { question: 'Can I use the cleaned image as a new thumbnail?', answer: 'You can download and reuse the result, but note that this tool reduces color cast — it does not add text, compose layouts, or create new thumbnails from scratch.' }
+      ]
+    }
   },
   feedback: {
     button: 'Feedback',
@@ -381,7 +489,11 @@ const filipinoDictionary: Dictionary = {
     auth: { checking: 'Tinitingnan ang login...', signIn: 'Mag-sign in', signOut: 'Mag-sign out', signOutWithName: 'Mag-sign out · {name}' },
     language: { label: 'Wika', button: 'Wika', menu: 'Pumili ng wika' },
     mobileMenu: { menu: 'Menu', open: 'Buksan ang navigation menu', close: 'Isara ang navigation menu' },
-    footer: { brand: 'Remove Matcha Filter · Natural photo recovery gamit ang AI', privacy: 'Privacy', terms: 'Terms', refund: 'Refund', contact: 'Contact:' }
+    footer: { brand: 'Remove Matcha Filter · Natural photo recovery gamit ang AI', privacy: 'Privacy', terms: 'Terms', refund: 'Refund', contact: 'Contact:',
+      tools: 'Tools',
+      legal: 'Legal',
+      tiktok: 'TikTok Remove Matcha Filter',
+      youtube: 'YouTube Remove Matcha Filter' }
   },
   metadata: {
     ...englishDictionary.metadata,
@@ -501,7 +613,8 @@ const indonesianDictionary: Dictionary = {
     auth: { checking: 'Memeriksa login...', signIn: 'Masuk', signOut: 'Keluar', signOutWithName: 'Keluar · {name}' },
     language: { label: 'Bahasa', button: 'Bahasa', menu: 'Pilih bahasa' },
     mobileMenu: { menu: 'Menu', open: 'Buka menu navigasi', close: 'Tutup menu navigasi' },
-    footer: { brand: 'Remove Matcha Filter · Pemulihan foto natural dengan AI', privacy: 'Privasi', terms: 'Ketentuan', refund: 'Refund', contact: 'Kontak:' }
+    footer: { brand: 'Remove Matcha Filter · Pemulihan foto natural dengan AI', privacy: 'Privasi', terms: 'Ketentuan', refund: 'Refund', contact: 'Kontak:', tools: 'Tools',
+      legal: 'Legal', tiktok: 'TikTok Remove Matcha Filter', youtube: 'YouTube Remove Matcha Filter' }
   },
   metadata: {
     ...englishDictionary.metadata,

@@ -189,7 +189,7 @@ export function UploadPageFlow() {
     setNoticeMessage(null);
 
     try {
-      const signResponse = await fetch('/api/matcha-filter-removers/sign', {
+      const signResponse = await fetch('/api/uploads/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: file.name, contentType: file.type, sizeBytes: file.size })

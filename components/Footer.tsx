@@ -30,17 +30,17 @@ const partnerBadges = [
   {
     href: 'https://smollist.com/projects/remove-matcha-filter-ai?utm_source=badge',
     title: 'Featured on Smol List',
-    img: <img src="https://r2.direasy-multi-tenant.focusapps.app/uploads/616d0b1a-3979-4b8c-94d1-b4f1fedd3ead/1783046749147/q1b2bvmvyl/featured-on-light.svg" alt="Featured on Smol List" style={{ height: '100%', width: 'auto' }} />
+    img: <img src="https://r2.direasy-multi-tenant.focusapps.app/uploads/616d0b1a-3979-4b8c-94d1-fedd3ead/1783046749147/q1b2bvmvyl/featured-on-light.svg" alt="Featured on Smol List" style={{ height: '100%', width: 'auto' }} />
   },
   {
     href: 'https://findly.tools/remove-matcha-filter?utm_source=remove-matcha-filter',
     title: 'Featured on Findly.tools',
-    img: <img className="h-full w-auto object-contain" src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="175" height="55" />
+    img: <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="175" height="55" />
   },
   {
     href: 'https://saastool.site/item/remove-matcha-filter',
     title: 'Featured on SaaSTool.site',
-    img: <img className="h-full w-auto object-contain" src="https://saastool.site/badges/saastool-light.svg" alt="Featured on SaaSTool.site" height="54" width="175" />
+    img: <img src="https://saastool.site/badges/saastool-light.svg" alt="Featured on SaaSTool.site" height="54" width="175" />
   },
   {
     href: 'https://aitop10.tools/',
@@ -49,26 +49,57 @@ const partnerBadges = [
   }
 ] as const;
 
-// Footer 提供全站必须保留的合规入口和联系邮箱。
+// Footer 提供全站必须保留的合规入口、Tools 菜单和联系邮箱。
 export function Footer() {
   const { dictionary, locale } = useI18n();
+  const footerCopy = dictionary.common.footer;
 
   return (
-    <footer className="flex flex-col gap-4 border-t border-matcha-200/70 py-8 text-sm text-slate-500">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <p>{dictionary.common.footer.brand}</p>
-        <nav className="flex flex-col items-start gap-3 md:flex-row md:items-center md:gap-5">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <Link className="transition hover:text-matcha-800" href={localizePath('/privacy', locale)}>{dictionary.common.footer.privacy}</Link>
-            <Link className="transition hover:text-matcha-800" href={localizePath('/terms', locale)}>{dictionary.common.footer.terms}</Link>
-            <Link className="transition hover:text-matcha-800" href={localizePath('/refund', locale)}>{dictionary.common.footer.refund}</Link>
+    <footer className="flex flex-col gap-6 border-t border-matcha-200/70 py-8 text-sm text-slate-500">
+      {/* 导航区域：Tools 菜单 + Legal 菜单 + 联系方式 */}
+      <div className="flex flex-col gap-6 md:flex-row md:gap-12">
+        {/* Tools 菜单分组 */}
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-matcha-700">{footerCopy.tools}</p>
+          <div className="flex flex-col gap-1.5">
+            <Link className="transition hover:text-matcha-800" href={localizePath('/tiktok-remove-matcha-filter', locale)}>
+              {footerCopy.tiktok}
+            </Link>
+            <Link className="transition hover:text-matcha-800" href={localizePath('/youtube-remove-matcha-filter', locale)}>
+              {footerCopy.youtube}
+            </Link>
           </div>
-          <a className="w-full border-t border-matcha-200 pt-3 leading-6 transition hover:text-matcha-800 md:w-auto md:border-l md:border-t-0 md:pl-5 md:pt-0" href="mailto:support@removematchafilter.org">
-            <span className="mr-1">{dictionary.common.footer.contact}</span>
-            <span className="break-all">support@removematchafilter.org</span>
+        </div>
+
+        {/* Legal 菜单分组 */}
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-matcha-700">{footerCopy.legal}</p>
+          <div className="flex flex-col gap-1.5">
+            <Link className="transition hover:text-matcha-800" href={localizePath('/privacy', locale)}>
+              {footerCopy.privacy}
+            </Link>
+            <Link className="transition hover:text-matcha-800" href={localizePath('/terms', locale)}>
+              {footerCopy.terms}
+            </Link>
+            <Link className="transition hover:text-matcha-800" href={localizePath('/refund', locale)}>
+              {footerCopy.refund}
+            </Link>
+          </div>
+        </div>
+
+        {/* 联系方式 */}
+        <div className="flex flex-col gap-2 md:ml-auto">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-matcha-700">{footerCopy.contact.replace(':', '')}</p>
+          <a className="leading-6 transition hover:text-matcha-800" href="mailto:support@removematchafilter.org">
+            support@removematchafilter.org
           </a>
-        </nav>
+        </div>
       </div>
+
+      {/* 品牌名 */}
+      <p>{footerCopy.brand}</p>
+
+      {/* 合作徽章滚动 */}
       <div className="overflow-hidden">
         <div className="flex w-max flex-nowrap items-center justify-start gap-3 whitespace-nowrap animate-partner-marquee">
           <div className="flex flex-nowrap items-center gap-3">
