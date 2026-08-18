@@ -10,6 +10,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { Job, RestoreMode, WhiteBalanceMode, UploadSignResponse } from '@/lib/types';
 import type { ChangeEvent, DragEvent } from 'react';
 import { useJobPolling } from '@/lib/useJobPolling';
+import { AppMessage } from './AppMessage';
 
 // UploadFlowCopy 定义上传交互组件内部消费的语言包片段。
 type UploadFlowCopy = Dictionary['upload']['flow'];
@@ -31,6 +32,7 @@ export function UploadPageFlow() {
   const [isFreeProcessing, setIsFreeProcessing] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [appMessage, setAppMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [restoreMode, setRestoreMode] = useState<RestoreMode>('natural');
@@ -248,7 +250,7 @@ export function UploadPageFlow() {
       const jobResult = await jobResponse.json();
       setJobId(jobResult.jobId);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : copy.errors.upload);
+      setAppMessage({ text: error instanceof Error ? error.message : copy.errors.upload, type: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -426,9 +428,9 @@ export function UploadPageFlow() {
         <canvas className="hidden" ref={canvasRef} />
       </div>
 
+      <AppMessage notice={appMessage} onClose={() => setAppMessage(null)} />
       <div className="border-t border-white/70 bg-white/45 px-5 py-4 text-sm text-slate-600 md:px-7">
-        {errorMessage ? <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-semibold text-red-700">{errorMessage === 'INSUFFICIENT_CREDITS' ? copy.hero.needCredits : errorMessage}</p> : null}
-        {!errorMessage && !job ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">{copy.hero.footerNote}</p> : null}
+        {!appMessage && !job ? <p className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">{copy.hero.footerNote}</p> : null}
       </div>
     </div>
   );
